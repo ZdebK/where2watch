@@ -37,9 +37,9 @@ export function StreamingSitesPicker({
         )}
       </div>
       {error && (
-        <p className="text-sm mt-1" style={{ color: 'var(--w2w-error)' }}>
+        <span className="formError">
           {error}
-        </p>
+        </span>
       )}
     </div>
   )

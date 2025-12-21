@@ -11,6 +11,24 @@ interface MovieListFiltersProps {
   onSortChange: (sort: 'popular' | 'latest' | 'a-z' | 'rating' | 'newest') => void;
 }
 
+const YEAR_RANGES = [
+  { value: 'all' as const, label: 'All Years' },
+  { value: 'last-5' as const, label: 'Last 5 years' },
+  { value: 'last-10' as const, label: 'Last 10 years' },
+  { value: '2000s' as const, label: '2000–2009' },
+  { value: '90s' as const, label: '1990–1999' },
+  { value: '80s' as const, label: '1980–1989' },
+  { value: 'older' as const, label: 'Before 1980' },
+];
+
+const SORT_OPTIONS = [
+  { value: 'popular' as const, label: 'Popular' },
+  { value: 'latest' as const, label: 'Latest Release' },
+  { value: 'newest' as const, label: 'Recently Added' },
+  { value: 'rating' as const, label: 'Highest Rated' },
+  { value: 'a-z' as const, label: 'A–Z' },
+];
+
 export function MovieListFilters({
   platforms,
   activePlatforms,
@@ -45,52 +63,57 @@ export function MovieListFilters({
         </div>
 
         {/* Genre, Year, Sort */}
-        <div className="flex flex-wrap items-center gap-4">
-          <select
-            value={activeGenre}
-            onChange={(e) => onGenreChange(e.target.value)}
-            className={`px-4 py-2 rounded-lg outline-none text-sm bg-deep-navy text-soft-gray border transition-colors ${
-              activeGenre !== 'all'
-                ? 'border-orange/70 shadow-[0_0_0_1px_rgba(255,138,0,0.5)]'
-                : 'border-subtle'
-            }`}
-          >
-            {genres.map((genre) => (
-              <option key={genre} value={genre}>
-                {genre === 'all' ? 'All Genres' : genre}
-              </option>
-            ))}
-          </select>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-wrap items-center gap-4">
+            <div>
+              <select
+                value={activeGenre}
+                onChange={(e) => onGenreChange(e.target.value)}
+                className={`filter-select select-chevron ${
+                  activeGenre !== 'all' ? 'filter-select-active' : ''
+                }`}
+              >
+                {genres.map((genre) => (
+                  <option key={genre} value={genre}>
+                    {genre === 'all' ? 'All Genres' : genre}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          <select
-            value={yearRange}
-            onChange={(e) => onYearRangeChange(e.target.value as MovieListFiltersProps['yearRange'])}
-            className={`px-4 py-2 rounded-lg outline-none text-sm bg-deep-navy text-soft-gray border border-subtle transition-colors ${
-              yearRange !== 'all' ? 'border-orange/70 shadow-[0_0_0_1px_rgba(255,138,0,0.5)]' : ''
-            }`}
-          >
-            <option value="all">All Years</option>
-            <option value="last-5">Last 5 years</option>
-            <option value="last-10">Last 10 years</option>
-            <option value="2000s">2000–2009</option>
-            <option value="90s">1990–1999</option>
-            <option value="80s">1980–1989</option>
-            <option value="older">Before 1980</option>
-          </select>
+            <div>
+              <select
+                value={yearRange}
+                onChange={(e) => onYearRangeChange(e.target.value as MovieListFiltersProps['yearRange'])}
+                className={`filter-select select-chevron ${
+                  yearRange !== 'all' ? 'filter-select-active' : ''
+                }`}
+              >
+                {YEAR_RANGES.map((range) => (
+                  <option key={range.value} value={range.value}>
+                    {range.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
 
-          <select
-            value={sortBy}
-            onChange={(e) => onSortChange(e.target.value as 'popular' | 'latest' | 'a-z' | 'rating' | 'newest')}
-            className={`px-4 py-2 rounded-lg outline-none text-sm bg-deep-navy text-soft-gray border border-subtle transition-colors ${
-              sortBy !== 'popular' ? 'border-orange/70 shadow-[0_0_0_1px_rgba(255,138,0,0.5)]' : ''
-            }`}
-          >
-            <option value="popular">Popular</option>
-            <option value="latest">Latest Release</option>
-            <option value="newest">Recently Added</option>
-            <option value="rating">Highest Rated</option>
-            <option value="a-z">A–Z</option>
-          </select>
+          <div className="flex items-center gap-2">
+            <span className="text-soft-gray text-sm">Sort:</span>
+            <select
+              value={sortBy}
+              onChange={(e) => onSortChange(e.target.value as 'popular' | 'latest' | 'a-z' | 'rating' | 'newest')}
+              className={`filter-select select-chevron ${
+                sortBy !== 'popular' ? 'filter-select-active' : ''
+              }`}
+            >
+              {SORT_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
     </div>

@@ -301,12 +301,19 @@ html {
   .filter-select option {
     background: var(--w2w-graphite);
     color: var(--w2w-pure-white);
+    padding-left: 0.5rem;
   }
 
-  .filter-select option:checked,
   .filter-select option:hover {
-    background: linear-gradient(135deg, rgba(255, 138, 0, 0.25), rgba(255, 138, 0, 0.15));
-    color: var(--w2w-pure-white);
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: var(--w2w-pure-white) !important;
+  }
+
+  .filter-select option:checked {
+    background: var(--w2w-orange) !important;
+    background-color: var(--w2w-orange) !important;
+    color: var(--w2w-pure-white) !important;
+    font-weight: 600;
   }
 
   .select-chevron:hover,

@@ -7,7 +7,7 @@ interface StarRatingProps {
 export function StarRating({ value, onChange, max = 10 }: StarRatingProps) {
   return (
     <div>
-      <label style={{ color: 'var(--w2w-pure-white)' }} className="block mb-2">
+      <label className="formLabel">
         Rating (0-{max})
       </label>
       <div className="flex items-center gap-2">
@@ -16,16 +16,7 @@ export function StarRating({ value, onChange, max = 10 }: StarRatingProps) {
             key={star}
             type="button"
             onClick={() => onChange(star)}
-            className="text-2xl transition-all"
-            style={{
-              color: star <= value ? 'var(--w2w-orange)' : 'rgba(255, 255, 255, 0.2)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = 'scale(1.2)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.transform = 'scale(1)';
-            }}
+            className={`btn-star ${star <= value ? 'active' : 'inactive'}`}
             aria-label={`Rate ${star} out of ${max}`}
           >
             ★

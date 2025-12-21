@@ -21,78 +21,43 @@ interface FormSelectProps extends Omit<InputHTMLAttributes<HTMLSelectElement>, '
 
 export function FormInput({ label, error, required, ...props }: FormInputProps) {
   return (
-    <div>
-      <label style={{ color: 'var(--w2w-pure-white)' }} className="block mb-2">
-        {label} {required && '*'}
+    <div className="formGroup">
+      <label className={`formLabel ${required ? 'required' : ''}`}>
+        {label}
       </label>
       <input
         {...props}
-        className="w-full px-4 py-2 rounded-lg outline-none transition-all"
-        style={{
-          backgroundColor: 'var(--w2w-deep-navy)',
-          color: 'var(--w2w-pure-white)',
-          border: `1px solid ${error ? 'var(--w2w-error)' : 'transparent'}`,
-        }}
-        onFocus={(e) => {
-          e.target.style.borderColor = 'var(--w2w-orange)';
-        }}
-        onBlur={(e) => {
-          if (!error) e.target.style.borderColor = 'transparent';
-        }}
+        className={`formField formInput ${error ? 'error' : ''}`}
       />
-      {error && (
-        <p className="text-sm mt-1" style={{ color: 'var(--w2w-error)' }}>
-          {error}
-        </p>
-      )}
+      {error && <span className="formError">{error}</span>}
     </div>
   );
 }
 
 export function FormTextarea({ label, error, required, ...props }: FormTextareaProps) {
   return (
-    <div>
-      <label style={{ color: 'var(--w2w-pure-white)' }} className="block mb-2">
-        {label} {required && '*'}
+    <div className="formGroup">
+      <label className={`formLabel ${required ? 'required' : ''}`}>
+        {label}
       </label>
       <textarea
         {...props}
-        className="w-full px-4 py-2 rounded-lg outline-none transition-all resize-none"
-        style={{
-          backgroundColor: 'var(--w2w-deep-navy)',
-          color: 'var(--w2w-pure-white)',
-          border: `1px solid ${error ? 'var(--w2w-error)' : 'transparent'}`,
-        }}
-        onFocus={(e) => {
-          e.target.style.borderColor = 'var(--w2w-orange)';
-        }}
-        onBlur={(e) => {
-          if (!error) e.target.style.borderColor = 'transparent';
-        }}
+        className={`formField formTextarea ${error ? 'error' : ''}`}
       />
-      {error && (
-        <p className="text-sm mt-1" style={{ color: 'var(--w2w-error)' }}>
-          {error}
-        </p>
-      )}
+      {error && <span className="formError">{error}</span>}
     </div>
   );
 }
 
 export function FormSelect({ label, error, required, options, ...props }: FormSelectProps) {
   return (
-    <div>
-      <label style={{ color: 'var(--w2w-pure-white)' }} className="block mb-2">
-        {label} {required && '*'}
+    <div className="formGroup">
+      <label className={`formLabel ${required ? 'required' : ''}`}>
+        {label}
       </label>
       <select
         {...props}
-        className="w-full px-4 py-2 rounded-lg outline-none transition-all"
-        style={{
-          backgroundColor: 'var(--w2w-deep-navy)',
-          color: 'var(--w2w-pure-white)',
-          border: `1px solid ${error ? 'var(--w2w-error)' : 'transparent'}`,
-        }}
+        className={`formField formSelect ${error ? 'error' : ''}`}
       >
         {options.map((opt) => (
           <option key={opt.value} value={opt.value}>
@@ -100,11 +65,7 @@ export function FormSelect({ label, error, required, options, ...props }: FormSe
           </option>
         ))}
       </select>
-      {error && (
-        <p className="text-sm mt-1" style={{ color: 'var(--w2w-error)' }}>
-          {error}
-        </p>
-      )}
+      {error && <span className="formError">{error}</span>}
     </div>
   );
 }

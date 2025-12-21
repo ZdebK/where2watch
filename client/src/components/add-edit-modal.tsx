@@ -54,8 +54,7 @@ export function AddEditModal({ isOpen, onClose, onSave, movie }: AddEditModalPro
           </h2>
           <button
             onClick={handleClose}
-            className="p-1 rounded-lg transition-colors hover:bg-white/10"
-            style={{ color: 'var(--w2w-soft-gray)' }}
+            className="btn-icon"
           >
             <X size={24} />
           </button>
@@ -199,27 +198,13 @@ export function AddEditModal({ isOpen, onClose, onSave, movie }: AddEditModalPro
           <button
             type="button"
             onClick={handleClose}
-            className="px-6 py-2 rounded-lg transition-all"
-            style={{
-              backgroundColor: 'var(--w2w-deep-navy)',
-              color: 'var(--w2w-soft-gray)',
-            }}
+            className="btn btn-secondary"
           >
             Cancel
           </button>
           <button
             onClick={onSubmit}
-            className="px-6 py-2 rounded-lg transition-all"
-            style={{
-              backgroundColor: 'var(--w2w-orange)',
-              color: 'var(--w2w-pure-white)',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 138, 0, 0.3)';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = 'none';
-            }}
+            className="btn btn-primary"
           >
             {movie ? 'Save Changes' : 'Add Movie'}
           </button>

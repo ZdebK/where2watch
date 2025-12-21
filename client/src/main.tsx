@@ -2,6 +2,8 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import "./styles/globals.css";
+import "./styles/components/form.css";
+import "./styles/components/button.css";
 
 // Expose API URL for services (works in browser; tests can set __W2W_API_URL manually)
 (globalThis as any).__W2W_API_URL = import.meta.env.VITE_API_URL;

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Movie } from './movie-card';
 import { MovieListHeader } from './movie-list-header';
 import { MovieListFilters } from './movie-list-filters';
@@ -33,6 +33,11 @@ export function MovieList() {
   const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
 
   const genres = ['all', 'Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Thriller', 'Romance', 'Adventure'];
+
+  // Reset infinite scroll when filters/sort changes (but not search - that's client-side)
+  useEffect(() => {
+    refetch();
+  }, [activeGenre, activeYearRange, sortBy, activePlatforms.length]);
 
   const handleSaveMovie = async (movieData: Omit<Movie, 'id'> & { id?: string }) => {
     const requestData = {

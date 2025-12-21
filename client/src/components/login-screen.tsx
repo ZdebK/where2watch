@@ -56,20 +56,7 @@ export function LoginScreen() {
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="email"
               required
-              className="w-full px-4 py-3 rounded-lg transition-all outline-none focus:ring-2"
-              style={{
-                backgroundColor: 'var(--w2w-graphite)',
-                color: 'var(--w2w-pure-white)',
-                border: '1px solid transparent',
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = 'var(--w2w-orange)';
-                e.target.style.boxShadow = '0 0 0 2px rgba(255, 138, 0, 0.1)';
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = 'transparent';
-                e.target.style.boxShadow = 'none';
-              }}
+              className="formField w-full"
             />
           </div>
 
@@ -83,43 +70,14 @@ export function LoginScreen() {
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="current-password"
               required
-              className="w-full px-4 py-3 rounded-lg transition-all outline-none focus:ring-2"
-              style={{
-                backgroundColor: 'var(--w2w-graphite)',
-                color: 'var(--w2w-pure-white)',
-                border: '1px solid transparent',
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = 'var(--w2w-orange)';
-                e.target.style.boxShadow = '0 0 0 2px rgba(255, 138, 0, 0.1)';
-              }}
-              onBlur={(e) => {
-                e.target.style.borderColor = 'transparent';
-                e.target.style.boxShadow = 'none';
-              }}
+              className="formField w-full"
             />
           </div>
 
           <button
             type="submit"
-            className="w-full py-3 rounded-lg transition-all"
+            className="btn btn-primary w-full"
             disabled={isLoading}
-            style={{
-              backgroundColor: 'var(--w2w-orange)',
-              color: 'var(--w2w-pure-white)',
-              opacity: isLoading ? 0.7 : 1,
-              cursor: isLoading ? 'not-allowed' : 'pointer',
-            }}
-            onMouseEnter={(e) => {
-              if (isLoading) return;
-              e.currentTarget.style.transform = 'translateY(-1px)';
-              e.currentTarget.style.boxShadow = '0 8px 16px rgba(255, 138, 0, 0.3)';
-            }}
-            onMouseLeave={(e) => {
-              if (isLoading) return;
-              e.currentTarget.style.transform = 'translateY(0)';
-              e.currentTarget.style.boxShadow = 'none';
-            }}
           >
             {isLoading ? 'Logging in...' : 'Login'}
           </button>

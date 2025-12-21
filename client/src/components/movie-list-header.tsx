@@ -41,7 +41,7 @@ export function MovieListHeader({
             {/* Logout Button */}
             <button
               onClick={onLogout}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all text-pure-white bg-white/10 hover:bg-orange/20 focus-orange-ring"
+              className="btn-logout"
               title={`Logged in as: ${userEmail}`}
               aria-label="Logout"
             >

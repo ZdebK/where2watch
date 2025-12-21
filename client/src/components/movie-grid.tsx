@@ -41,11 +41,7 @@ export function MovieGrid({
         {isEmpty && (
           <button
             onClick={onAddNew}
-            className="px-6 py-3 rounded-lg transition-all"
-            style={{
-              backgroundColor: 'var(--w2w-orange)',
-              color: 'var(--w2w-pure-white)',
-            }}
+            className="btn btn-primary"
           >
             Add Movie
           </button>
@@ -97,12 +93,7 @@ export function MovieGrid({
           <button
             type="button"
             onClick={onLoadMore}
-            className="px-4 py-2 rounded-lg text-sm transition-colors"
-            style={{
-              backgroundColor: 'var(--w2w-deep-navy)',
-              color: 'var(--w2w-pure-white)',
-              border: '1px solid rgba(255, 255, 255, 0.1)',
-            }}
+            className="btn-load-more"
           >
             {isLoadingMore ? 'Loading…' : 'Load more'}
           </button>
