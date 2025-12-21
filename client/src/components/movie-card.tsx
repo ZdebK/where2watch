@@ -3,12 +3,20 @@ import React, { useState } from 'react';
 export interface Movie {
   id: string;
   title: string;
+  originalTitle?: string;
   year: number;
   genre: string;
   rating: string;
   description: string;
   posterUrl: string;
   streamingSites: string[];
+  score?: number;
+  releaseDate?: Date;
+  durationMinutes?: number;
+  director?: string;
+  language?: string;
+  country?: string;
+  isAvailable?: boolean;
 }
 
 interface MovieCardProps {

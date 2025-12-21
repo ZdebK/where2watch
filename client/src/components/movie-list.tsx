@@ -1,14 +1,17 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback, useRef } from 'react';
 import { Search, Plus, LogOut } from 'lucide-react';
 import { Logo } from './logo';
 import { MovieCard, Movie } from './movie-card';
 import { AddEditModal } from './add-edit-modal';
 import { useAuth } from '../contexts/auth.context';
+import { useStreamingSites } from '../contexts/streaming-sites.context';
+import { useApiCall } from '../hooks/useApiCall';
 import { apiClient, MovieDTO } from '../api/client';
 import { toast } from 'sonner';
 
 export function MovieList() {
   const { user, logout } = useAuth();
+  const { streamingSites: platforms } = useStreamingSites();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTab, setActiveTab] = useState<'all' | 'movies' | 'series'>('all');
   const [activePlatforms, setActivePlatforms] = useState<string[]>([]);
@@ -17,42 +20,57 @@ export function MovieList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
   const [movies, setMovies] = useState<Movie[]>([]);
-  const [isLoadingMovies, setIsLoadingMovies] = useState(true);
+  const hasFetchedMovies = useRef(false);
 
-  // Convert API DTO to UI model
-  const convertDtoToMovie = (dto: MovieDTO): Movie => {
+  const fetchMovies = useCallback(() => apiClient.getAllMovies(), []);
+
+  const convertDtoToMovie = useCallback((dto: MovieDTO): Movie => {
     return {
       id: dto.id,
       title: dto.name,
+      originalTitle: dto.originalTitle,
       year: dto.releaseDate ? new Date(dto.releaseDate).getFullYear() : new Date().getFullYear(),
       genre: dto.genre || 'Unknown',
       rating: dto.ageRating || 'Not Rated',
       description: dto.description || '',
       posterUrl: dto.posterUrl || '',
       streamingSites: dto.streamingSites?.map(site => site.name) || [],
+      score: dto.score,
+      releaseDate: dto.releaseDate ? new Date(dto.releaseDate) : undefined,
+      durationMinutes: dto.durationMinutes,
+      director: dto.director,
+      language: dto.language,
+      country: dto.country,
+      isAvailable: dto.isAvailable,
     };
-  };
-
-  // Load movies from API
-  useEffect(() => {
-    const loadMovies = async () => {
-      try {
-        setIsLoadingMovies(true);
-        const moviesFromApi = await apiClient.getAllMovies();
-        const convertedMovies = moviesFromApi.map(convertDtoToMovie);
-        setMovies(convertedMovies);
-      } catch (error) {
-        console.error('Failed to load movies:', error);
-        toast.error('Failed to load movies from server');
-      } finally {
-        setIsLoadingMovies(false);
-      }
-    };
-
-    loadMovies();
   }, []);
 
-  const platforms = ['Netflix', 'HBO', 'Prime Video', 'Disney+'];
+  const handleMoviesError = useCallback((err: Error) => {
+    console.error('[MovieList] fetch failed', err);
+  }, []);
+
+  const handleMoviesSuccess = useCallback((moviesFromApi: MovieDTO[]) => {
+    const convertedMovies = moviesFromApi.map(convertDtoToMovie);
+    setMovies(convertedMovies);
+  }, [convertDtoToMovie]);
+
+  // Load movies using useApiCall
+  const { isLoading: isLoadingMovies, execute: loadMovies } = useApiCall(
+    fetchMovies,
+    {
+      errorMessage: 'Failed to load movies from server',
+      onError: handleMoviesError,
+      onSuccess: handleMoviesSuccess,
+    }
+  );
+
+  // Load movies on mount
+  useEffect(() => {
+    if (hasFetchedMovies.current) return;
+    hasFetchedMovies.current = true;
+    loadMovies();
+  }, [loadMovies]);
+
   const genres = ['all', 'Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Thriller', 'Romance', 'Adventure'];
 
   const filteredMovies = useMemo(() => {
@@ -96,17 +114,23 @@ export function MovieList() {
   };
 
   const handleSaveMovie = async (movieData: Omit<Movie, 'id'> & { id?: string }) => {
-    try {
-      const requestData = {
-        name: movieData.title,
-        description: movieData.description,
-        genre: movieData.genre,
-        ageRating: movieData.rating,
-        posterUrl: movieData.posterUrl,
-        releaseDate: new Date(movieData.year, 0, 1).toISOString(),
-        streamingSiteNames: movieData.streamingSites,
-      };
+    const requestData = {
+      name: movieData.title,
+      originalTitle: movieData.originalTitle,
+      description: movieData.description,
+      genre: movieData.genre,
+      ageRating: movieData.rating,
+      posterUrl: movieData.posterUrl,
+      releaseDate: movieData.releaseDate?.toISOString(),
+      streamingSiteNames: movieData.streamingSites,
+      score: movieData.score,
+      durationMinutes: movieData.durationMinutes,
+      director: movieData.director,
+      language: movieData.language,
+      country: movieData.country,
+    };
 
+    try {
       if (movieData.id) {
         // Edit existing movie
         const updated = await apiClient.updateMovie(movieData.id, requestData);

@@ -58,7 +58,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsLoading(true);
     try {
       const response = await authService.login({ email, password });
-      setUser(response.user);
+      setUser({
+        id: response.user.id.toString(),
+        email: response.user.email,
+        username: response.user.name,
+      });
       setIsAuthenticated(true);
     } catch (error) {
       console.error('Login failed:', error);

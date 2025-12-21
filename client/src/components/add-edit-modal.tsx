@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { X, Upload, Trash2 } from 'lucide-react';
+import { X, Trash2 } from 'lucide-react';
 import { Movie } from './movie-card';
+import { useStreamingSites } from '../contexts/streaming-sites.context';
 
 interface AddEditModalProps {
   isOpen: boolean;
@@ -11,40 +12,75 @@ interface AddEditModalProps {
 
 const genres = ['Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Thriller', 'Romance', 'Adventure'];
 const ratings = ['G', 'PG', 'PG-13', 'R', 'NC-17'];
-const platforms = ['Netflix', 'HBO', 'Prime Video', 'Disney+'];
+
+interface FormData {
+  title: string;
+  originalTitle: string;
+  year: number;
+  releaseDate: string;
+  genre: string;
+  rating: string;
+  description: string;
+  posterUrl: string;
+  streamingSites: string[];
+  score: number;
+  durationMinutes: string;
+  director: string;
+  language: string;
+  country: string;
+  isAvailable: boolean;
+}
+
+const initialFormData: FormData = {
+  title: '',
+  originalTitle: '',
+  year: new Date().getFullYear(),
+  releaseDate: '',
+  genre: 'Action',
+  rating: 'PG-13',
+  description: '',
+  posterUrl: '',
+  streamingSites: [],
+  score: 0,
+  durationMinutes: '',
+  director: '',
+  language: '',
+  country: '',
+  isAvailable: true,
+};
 
 export function AddEditModal({ isOpen, onClose, onSave, movie }: AddEditModalProps) {
-  const [title, setTitle] = useState('');
-  const [year, setYear] = useState(new Date().getFullYear());
-  const [genre, setGenre] = useState('Action');
-  const [rating, setRating] = useState('PG-13');
-  const [description, setDescription] = useState('');
-  const [posterUrl, setPosterUrl] = useState('');
-  const [streamingSites, setStreamingSites] = useState<string[]>([]);
+  const { streamingSites: platforms, isLoading: isPlatformsLoading } = useStreamingSites();
+  const [formData, setFormData] = useState<FormData>(initialFormData);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
     if (movie) {
-      setTitle(movie.title);
-      setYear(movie.year);
-      setGenre(movie.genre);
-      setRating(movie.rating);
-      setDescription(movie.description);
-      setPosterUrl(movie.posterUrl);
-      setStreamingSites(movie.streamingSites);
+      setFormData({
+        title: movie.title,
+        originalTitle: movie.originalTitle || '',
+        year: movie.year,
+        releaseDate: movie.releaseDate ? new Date(movie.releaseDate).toISOString().split('T')[0] : '',
+        genre: movie.genre,
+        rating: movie.rating,
+        description: movie.description,
+        posterUrl: movie.posterUrl,
+        streamingSites: movie.streamingSites,
+        score: movie.score || 0,
+        durationMinutes: movie.durationMinutes?.toString() || '',
+        director: movie.director || '',
+        language: movie.language || '',
+        country: movie.country || '',
+        isAvailable: movie.isAvailable ?? true,
+      });
     } else {
-      resetForm();
+      setFormData(initialFormData);
     }
+    setErrors({});
   }, [movie, isOpen]);
 
   const resetForm = () => {
-    setTitle('');
-    setYear(new Date().getFullYear());
-    setGenre('Action');
-    setRating('PG-13');
-    setDescription('');
-    setPosterUrl('');
-    setStreamingSites([]);
+    setFormData(initialFormData);
     setErrors({});
   };
 
@@ -52,9 +88,9 @@ export function AddEditModal({ isOpen, onClose, onSave, movie }: AddEditModalPro
     e.preventDefault();
     const newErrors: Record<string, string> = {};
 
-    if (!title.trim()) newErrors.title = 'Title is required';
-    if (!posterUrl.trim()) newErrors.posterUrl = 'Poster is required';
-    if (streamingSites.length === 0) newErrors.streamingSites = 'At least one streaming site is required';
+    if (!formData.title.trim()) newErrors.title = 'Title is required';
+    if (!formData.posterUrl.trim()) newErrors.posterUrl = 'Poster is required';
+    if (formData.streamingSites.length === 0) newErrors.streamingSites = 'At least one streaming site is required';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -63,13 +99,21 @@ export function AddEditModal({ isOpen, onClose, onSave, movie }: AddEditModalPro
 
     onSave({
       id: movie?.id,
-      title,
-      year,
-      genre,
-      rating,
-      description,
-      posterUrl,
-      streamingSites,
+      title: formData.title,
+      originalTitle: formData.originalTitle || undefined,
+      year: formData.year,
+      genre: formData.genre,
+      rating: formData.rating,
+      description: formData.description,
+      posterUrl: formData.posterUrl,
+      streamingSites: formData.streamingSites,
+      score: formData.score || undefined,
+      releaseDate: formData.releaseDate ? new Date(formData.releaseDate) : undefined,
+      durationMinutes: formData.durationMinutes ? parseInt(formData.durationMinutes) : undefined,
+      director: formData.director || undefined,
+      language: formData.language || undefined,
+      country: formData.country || undefined,
+      isAvailable: formData.isAvailable,
     });
 
     resetForm();
@@ -82,25 +126,15 @@ export function AddEditModal({ isOpen, onClose, onSave, movie }: AddEditModalPro
   };
 
   const togglePlatform = (platform: string) => {
-    setStreamingSites((prev) =>
-      prev.includes(platform) ? prev.filter((p) => p !== platform) : [...prev, platform]
-    );
-  };
-
-  const handlePosterUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPosterUrl(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
+    setFormData((prev) => ({
+      ...prev,
+      streamingSites: prev.streamingSites.includes(platform)
+        ? prev.streamingSites.filter((p) => p !== platform)
+        : [...prev.streamingSites, platform],
+    }));
   };
 
   if (!isOpen) return null;
-
-  const years = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i);
 
   return (
     <div
@@ -135,66 +169,152 @@ export function AddEditModal({ isOpen, onClose, onSave, movie }: AddEditModalPro
             scrollbarWidth: 'thin',
             scrollbarColor: 'rgba(255, 255, 255, 0.1) transparent'
           }}>
-          {/* Title */}
-          <div>
-            <label style={{ color: 'var(--w2w-pure-white)' }} className="block mb-2">
-              Title
-            </label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter movie title"
-              className="w-full px-4 py-2 rounded-lg outline-none transition-all"
-              style={{
-                backgroundColor: 'var(--w2w-deep-navy)',
-                color: 'var(--w2w-pure-white)',
-                border: `1px solid ${errors.title ? 'var(--w2w-error)' : 'transparent'}`,
-              }}
-              onFocus={(e) => {
-                e.target.style.borderColor = 'var(--w2w-orange)';
-              }}
-              onBlur={(e) => {
-                if (!errors.title) e.target.style.borderColor = 'transparent';
-              }}
-            />
-            {errors.title && (
-              <p className="text-sm mt-1" style={{ color: 'var(--w2w-error)' }}>
-                {errors.title}
-              </p>
-            )}
-          </div>
-
-          {/* Year and Genre */}
+          {/* Title and Original Title */}
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label style={{ color: 'var(--w2w-pure-white)' }} className="block mb-2">
-                Year
+                Title *
               </label>
-              <select
-                value={year}
-                onChange={(e) => setYear(parseInt(e.target.value))}
+              <input
+                type="text"
+                value={formData.title}
+                onChange={(e) => setFormData((prev) => ({ ...prev, title: e.target.value }))}
+                placeholder="Enter movie title"
+                className="w-full px-4 py-2 rounded-lg outline-none transition-all"
+                style={{
+                  backgroundColor: 'var(--w2w-deep-navy)',
+                  color: 'var(--w2w-pure-white)',
+                  border: `1px solid ${errors.title ? 'var(--w2w-error)' : 'transparent'}`,
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'var(--w2w-orange)';
+                }}
+                onBlur={(e) => {
+                  if (!errors.title) e.target.style.borderColor = 'transparent';
+                }}
+              />
+              {errors.title && (
+                <p className="text-sm mt-1" style={{ color: 'var(--w2w-error)' }}>
+                  {errors.title}
+                </p>
+              )}
+            </div>
+            <div>
+              <label style={{ color: 'var(--w2w-pure-white)' }} className="block mb-2">
+                Original title
+              </label>
+              <input
+                type="text"
+                value={formData.originalTitle}
+                onChange={(e) => setFormData((prev) => ({ ...prev, originalTitle: e.target.value }))}
+                placeholder="Original title"
                 className="w-full px-4 py-2 rounded-lg outline-none transition-all"
                 style={{
                   backgroundColor: 'var(--w2w-deep-navy)',
                   color: 'var(--w2w-pure-white)',
                 }}
-              >
-                {years.map((y) => (
-                  <option key={y} value={y}>
-                    {y}
-                  </option>
-                ))}
-              </select>
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'var(--w2w-orange)';
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'transparent';
+                }}
+              />
             </div>
+          </div>
 
+          {/* Release Date, Duration, Director */}
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label style={{ color: 'var(--w2w-pure-white)' }} className="block mb-2">
+                Release date
+              </label>
+              <input
+                type="date"
+                value={formData.releaseDate}
+                onChange={(e) => setFormData((prev) => ({ ...prev, releaseDate: e.target.value }))}
+                className="w-full px-4 py-2 rounded-lg outline-none transition-all"
+                style={{
+                  backgroundColor: 'var(--w2w-deep-navy)',
+                  color: 'var(--w2w-pure-white)',
+                }}
+              />
+            </div>
+            <div>
+              <label style={{ color: 'var(--w2w-pure-white)' }} className="block mb-2">
+                Duration (min)
+              </label>
+              <input
+                type="number"
+                value={formData.durationMinutes}
+                onChange={(e) => setFormData((prev) => ({ ...prev, durationMinutes: e.target.value }))}
+                placeholder="120"
+                min="1"
+                className="w-full px-4 py-2 rounded-lg outline-none transition-all"
+                style={{
+                  backgroundColor: 'var(--w2w-deep-navy)',
+                  color: 'var(--w2w-pure-white)',
+                }}
+              />
+            </div>
+            <div>
+              <label style={{ color: 'var(--w2w-pure-white)' }} className="block mb-2">
+                Director
+              </label>
+              <input
+                type="text"
+                value={formData.director}
+                onChange={(e) => setFormData((prev) => ({ ...prev, director: e.target.value }))}
+                placeholder="Director name"
+                className="w-full px-4 py-2 rounded-lg outline-none transition-all"
+                style={{
+                  backgroundColor: 'var(--w2w-deep-navy)',
+                  color: 'var(--w2w-pure-white)',
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Score (Stars) */}
+          <div>
+            <label style={{ color: 'var(--w2w-pure-white)' }} className="block mb-2">
+              Rating (0-10)
+            </label>
+            <div className="flex items-center gap-1">
+              {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setFormData((prev) => ({ ...prev, score: star }))}
+                  className="text-2xl transition-all"
+                  style={{
+                    color: star <= formData.score ? 'var(--w2w-orange)' : 'rgba(255, 255, 255, 0.2)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.2)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)';
+                  }}
+                >
+                  ★
+                </button>
+              ))}
+              <span className="ml-2" style={{ color: 'var(--w2w-soft-gray)' }}>
+                {formData.score}/10
+              </span>
+            </div>
+          </div>
+
+          {/* Genre and Age Rating */}
+          <div className="grid grid-cols-2 gap-4">
             <div>
               <label style={{ color: 'var(--w2w-pure-white)' }} className="block mb-2">
                 Genre
               </label>
               <select
-                value={genre}
-                onChange={(e) => setGenre(e.target.value)}
+                value={formData.genre}
+                onChange={(e) => setFormData((prev) => ({ ...prev, genre: e.target.value }))}
                 className="w-full px-4 py-2 rounded-lg outline-none transition-all"
                 style={{
                   backgroundColor: 'var(--w2w-deep-navy)',
@@ -208,28 +328,63 @@ export function AddEditModal({ isOpen, onClose, onSave, movie }: AddEditModalPro
                 ))}
               </select>
             </div>
+
+            <div>
+              <label style={{ color: 'var(--w2w-pure-white)' }} className="block mb-2">
+                Age rating
+              </label>
+              <select
+                value={formData.rating}
+                onChange={(e) => setFormData((prev) => ({ ...prev, rating: e.target.value }))}
+                className="w-full px-4 py-2 rounded-lg outline-none transition-all"
+                style={{
+                  backgroundColor: 'var(--w2w-deep-navy)',
+                  color: 'var(--w2w-pure-white)',
+                }}
+              >
+                {ratings.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          {/* Rating */}
-          <div>
-            <label style={{ color: 'var(--w2w-pure-white)' }} className="block mb-2">
-              Rating
-            </label>
-            <select
-              value={rating}
-              onChange={(e) => setRating(e.target.value)}
-              className="w-full px-4 py-2 rounded-lg outline-none transition-all"
-              style={{
-                backgroundColor: 'var(--w2w-deep-navy)',
-                color: 'var(--w2w-pure-white)',
-              }}
-            >
-              {ratings.map((r) => (
-                <option key={r} value={r}>
-                  {r}
-                </option>
-              ))}
-            </select>
+          {/* Language and Country */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label style={{ color: 'var(--w2w-pure-white)' }} className="block mb-2">
+                Language
+              </label>
+              <input
+                type="text"
+                value={formData.language}
+                onChange={(e) => setFormData((prev) => ({ ...prev, language: e.target.value }))}
+                placeholder="Polski, English, etc."
+                className="w-full px-4 py-2 rounded-lg outline-none transition-all"
+                style={{
+                  backgroundColor: 'var(--w2w-deep-navy)',
+                  color: 'var(--w2w-pure-white)',
+                }}
+              />
+            </div>
+            <div>
+              <label style={{ color: 'var(--w2w-pure-white)' }} className="block mb-2">
+                Country of origin
+              </label>
+              <input
+                type="text"
+                value={formData.country}
+                onChange={(e) => setFormData((prev) => ({ ...prev, country: e.target.value }))}
+                placeholder="Poland, USA, etc."
+                className="w-full px-4 py-2 rounded-lg outline-none transition-all"
+                style={{
+                  backgroundColor: 'var(--w2w-deep-navy)',
+                  color: 'var(--w2w-pure-white)',
+                }}
+              />
+            </div>
           </div>
 
           {/* Description */}
@@ -238,8 +393,8 @@ export function AddEditModal({ isOpen, onClose, onSave, movie }: AddEditModalPro
               Description
             </label>
             <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={formData.description}
+              onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
               placeholder="Enter movie description"
               rows={4}
               className="w-full px-4 py-2 rounded-lg outline-none transition-all resize-none"
@@ -256,42 +411,50 @@ export function AddEditModal({ isOpen, onClose, onSave, movie }: AddEditModalPro
             />
           </div>
 
-          {/* Poster Upload */}
+          {/* Poster URL */}
           <div>
             <label style={{ color: 'var(--w2w-pure-white)' }} className="block mb-2">
-              Poster
+              Poster URL
             </label>
-            {posterUrl ? (
-              <div className="relative">
-                <img
-                  src={posterUrl}
-                  alt="Poster preview"
-                  className="w-32 h-48 object-cover rounded-lg"
-                />
-                <button
-                  type="button"
-                  onClick={() => setPosterUrl('')}
-                  className="absolute top-2 right-2 p-1 rounded-lg transition-colors"
-                  style={{ backgroundColor: 'var(--w2w-error)', color: 'white' }}
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
-            ) : (
-              <label
-                className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-all hover:border-[var(--w2w-orange)]"
+            <div className="flex flex-col gap-2">
+              <input
+                type="url"
+                value={formData.posterUrl}
+                onChange={(e) => setFormData((prev) => ({ ...prev, posterUrl: e.target.value }))}
+                placeholder="https://.../poster.jpg"
+                className="w-full px-4 py-2 rounded-lg outline-none transition-all"
                 style={{
-                  borderColor: errors.posterUrl ? 'var(--w2w-error)' : 'var(--w2w-soft-gray)',
                   backgroundColor: 'var(--w2w-deep-navy)',
+                  color: 'var(--w2w-pure-white)',
+                  border: `1px solid ${errors.posterUrl ? 'var(--w2w-error)' : 'transparent'}`,
                 }}
-              >
-                <Upload size={32} style={{ color: 'var(--w2w-soft-gray)' }} />
-                <p style={{ color: 'var(--w2w-soft-gray)' }} className="mt-2">
-                  Click to upload or drag & drop
-                </p>
-                <input type="file" className="hidden" accept="image/*" onChange={handlePosterUpload} />
-              </label>
-            )}
+                onFocus={(e) => {
+                  e.target.style.borderColor = 'var(--w2w-orange)';
+                }}
+                onBlur={(e) => {
+                  if (!errors.posterUrl) e.target.style.borderColor = 'transparent';
+                }}
+              />
+
+              {formData.posterUrl && (
+                <div className="relative w-32 h-48">
+                  <img
+                    src={formData.posterUrl}
+                    alt="Poster preview"
+                    className="w-32 h-48 object-cover rounded-lg"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setFormData((prev) => ({ ...prev, posterUrl: '' }))}
+                    className="absolute top-2 right-2 p-1 rounded-lg transition-colors"
+                    style={{ backgroundColor: 'var(--w2w-error)', color: 'white' }}
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              )}
+            </div>
+
             {errors.posterUrl && (
               <p className="text-sm mt-1" style={{ color: 'var(--w2w-error)' }}>
                 {errors.posterUrl}
@@ -305,33 +468,54 @@ export function AddEditModal({ isOpen, onClose, onSave, movie }: AddEditModalPro
               Streaming Sites
             </label>
             <div className="flex flex-wrap gap-2">
-              {platforms.map((platform) => (
-                <button
-                  key={platform}
-                  type="button"
-                  onClick={() => togglePlatform(platform)}
-                  className="px-4 py-2 rounded-lg transition-all"
-                  style={{
-                    backgroundColor: streamingSites.includes(platform)
-                      ? 'var(--w2w-orange)'
-                      : 'var(--w2w-deep-navy)',
-                    color: streamingSites.includes(platform)
-                      ? 'var(--w2w-pure-white)'
-                      : 'var(--w2w-soft-gray)',
-                  }}
-                >
-                  {platform}
-                  {streamingSites.includes(platform) && (
-                    <X size={14} className="inline ml-1" />
-                  )}
-                </button>
-              ))}
+              {isPlatformsLoading ? (
+                <p style={{ color: 'var(--w2w-soft-gray)' }}>Loading platforms...</p>
+              ) : (
+                platforms.map((platform) => (
+                  <button
+                    key={platform}
+                    type="button"
+                    onClick={() => togglePlatform(platform)}
+                    className="px-4 py-2 rounded-lg transition-all"
+                    style={{
+                      backgroundColor: formData.streamingSites.includes(platform)
+                        ? 'var(--w2w-orange)'
+                        : 'var(--w2w-deep-navy)',
+                      color: formData.streamingSites.includes(platform)
+                        ? 'var(--w2w-pure-white)'
+                        : 'var(--w2w-soft-gray)',
+                    }}
+                  >
+                    {platform}
+                    {formData.streamingSites.includes(platform) && (
+                      <X size={14} className="inline ml-1" />
+                    )}
+                  </button>
+                ))
+              )}
             </div>
             {errors.streamingSites && (
               <p className="text-sm mt-1" style={{ color: 'var(--w2w-error)' }}>
                 {errors.streamingSites}
               </p>
             )}
+          </div>
+
+          {/* Is Available Checkbox */}
+          <div className="flex items-center gap-3">
+            <input
+              type="checkbox"
+              id="isAvailable"
+              checked={formData.isAvailable}
+              onChange={(e) => setFormData((prev) => ({ ...prev, isAvailable: e.target.checked }))}
+              className="w-5 h-5 rounded cursor-pointer"
+              style={{
+                accentColor: 'var(--w2w-orange)',
+              }}
+            />
+            <label htmlFor="isAvailable" style={{ color: 'var(--w2w-pure-white)' }} className="cursor-pointer">
+              Movie is available
+            </label>
           </div>
         </form>
 

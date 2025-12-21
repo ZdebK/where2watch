@@ -62,26 +62,26 @@ describe('AuthService', () => {
     expect(authService.isAuthenticated()).toBe(false);
   });
 
-//   /**
-//    * Test: Get auth headers
-//    */
-//   it('should provide correct auth headers without token', () => {
-//     const headers = authService.getAuthHeader();
-//     expect(headers['Content-Type']).toBe('application/json');
-//     expect((headers as any)['Authorization']).toBeUndefined();
-//   });
+  /**
+   * Test: Get auth headers
+   */
+  it('should provide correct auth headers without token', () => {
+    const headers = authService.getAuthHeader();
+    expect(headers['Content-Type']).toBe('application/json');
+    expect((headers as any)['Authorization']).toBeUndefined();
+  });
 
-//   /**
-//    * Test: Get auth headers with token
-//    */
-//   it('should provide correct auth headers with token', () => {
-//     const testToken = 'test_jwt_token_123';
-//     authService['setToken'](testToken);
+  /**
+   * Test: Get auth headers with token
+   */
+  it('should provide correct auth headers with token', () => {
+    const testToken = 'test_jwt_token_123';
+    authService['setToken'](testToken);
 
-//     const headers = authService.getAuthHeader();
-//     expect(headers['Content-Type']).toBe('application/json');
-//     expect((headers as any)['Authorization']).toBe(`Bearer ${testToken}`);
-//   });
+    const headers = authService.getAuthHeader();
+    expect(headers['Content-Type']).toBe('application/json');
+    expect((headers as any)['Authorization']).toBe(`Bearer ${testToken}`);
+  });
 
   /**
    * Test: Surface server unavailable message when backend reports DB connectivity issues
