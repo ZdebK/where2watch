@@ -280,7 +280,7 @@ export function AddEditModal({ isOpen, onClose, onSave, movie }: AddEditModalPro
             <label style={{ color: 'var(--w2w-pure-white)' }} className="block mb-2">
               Rating (0-10)
             </label>
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((star) => (
                 <button
                   key={star}
@@ -300,7 +300,7 @@ export function AddEditModal({ isOpen, onClose, onSave, movie }: AddEditModalPro
                   ★
                 </button>
               ))}
-              <span className="ml-2" style={{ color: 'var(--w2w-soft-gray)' }}>
+              <span className="ml-4 text-base" style={{ color: 'var(--w2w-soft-gray)' }}>
                 {formData.score}/10
               </span>
             </div>
