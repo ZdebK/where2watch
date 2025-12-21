@@ -1,4 +1,5 @@
 import React from 'react';
+import logoImage from '../assets/where2watch-logo.png';
 
 interface LogoProps {
   onClick?: () => void;
@@ -9,11 +10,14 @@ export function Logo({ onClick, className = '' }: LogoProps) {
   return (
     <div
       onClick={onClick}
-      className={`inline-flex items-center gap-0 cursor-pointer ${className}`}
+      className={`inline-flex items-center cursor-pointer ${className}`}
     >
-      <span style={{ color: 'var(--w2w-pure-white)' }}>Where</span>
-      <span style={{ color: 'var(--w2w-orange)' }}>2</span>
-      <span style={{ color: 'var(--w2w-pure-white)' }}>Watch</span>
+      <img 
+        src={logoImage} 
+        alt="Where2Watch" 
+        className="h-9 w-auto object-contain"
+        style={{ maxHeight: '42px' }}
+      />
     </div>
   );
 }
