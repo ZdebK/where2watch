@@ -1,13 +1,13 @@
 -- Associate existing movies with streaming sites
 -- Finds movies by name and links them to streaming platforms
 
--- The Shawshank Redemption - Netflix, HBO Max
+-- The Shawshank Redemption - Netflix, Max
 INSERT INTO movie_streaming_sites (movie_id, streaming_site_id)
 SELECT m.id, s.id 
 FROM movies m
 CROSS JOIN streaming_sites s
 WHERE m.name = 'The Shawshank Redemption'
-  AND s.name IN ('Netflix', 'HBO Max')
+  AND s.name IN ('Netflix', 'Max')
 ON CONFLICT DO NOTHING;
 
 -- The Godfather - Paramount+
@@ -19,31 +19,31 @@ WHERE m.name = 'The Godfather'
   AND s.name = 'Paramount+'
 ON CONFLICT DO NOTHING;
 
--- The Dark Knight - HBO Max
+-- The Dark Knight - Max
 INSERT INTO movie_streaming_sites (movie_id, streaming_site_id)
 SELECT m.id, s.id 
 FROM movies m
 CROSS JOIN streaming_sites s
 WHERE m.name = 'The Dark Knight'
-  AND s.name = 'HBO Max'
+  AND s.name = 'Max'
 ON CONFLICT DO NOTHING;
 
--- Pulp Fiction - Netflix, Amazon Prime
+-- Pulp Fiction - Netflix, Prime Video
 INSERT INTO movie_streaming_sites (movie_id, streaming_site_id)
 SELECT m.id, s.id 
 FROM movies m
 CROSS JOIN streaming_sites s
 WHERE m.name = 'Pulp Fiction'
-  AND s.name IN ('Netflix', 'Amazon Prime Video')
+  AND s.name IN ('Netflix', 'Prime Video')
 ON CONFLICT DO NOTHING;
 
--- Inception - Netflix, HBO Max
+-- Inception - Netflix, Max
 INSERT INTO movie_streaming_sites (movie_id, streaming_site_id)
 SELECT m.id, s.id 
 FROM movies m
 CROSS JOIN streaming_sites s
 WHERE m.name = 'Inception'
-  AND s.name IN ('Netflix', 'HBO Max')
+  AND s.name IN ('Netflix', 'Max')
 ON CONFLICT DO NOTHING;
 
 -- Forrest Gump - Paramount+, Netflix
@@ -55,49 +55,49 @@ WHERE m.name = 'Forrest Gump'
   AND s.name IN ('Paramount+', 'Netflix')
 ON CONFLICT DO NOTHING;
 
--- The Matrix - HBO Max
+-- The Matrix - Max
 INSERT INTO movie_streaming_sites (movie_id, streaming_site_id)
 SELECT m.id, s.id 
 FROM movies m
 CROSS JOIN streaming_sites s
 WHERE m.name = 'The Matrix'
-  AND s.name = 'HBO Max'
+  AND s.name = 'Max'
 ON CONFLICT DO NOTHING;
 
--- Interstellar - Paramount+, Amazon Prime
+-- Interstellar - Paramount+, Prime Video
 INSERT INTO movie_streaming_sites (movie_id, streaming_site_id)
 SELECT m.id, s.id 
 FROM movies m
 CROSS JOIN streaming_sites s
 WHERE m.name = 'Interstellar'
-  AND s.name IN ('Paramount+', 'Amazon Prime Video')
+  AND s.name IN ('Paramount+', 'Prime Video')
 ON CONFLICT DO NOTHING;
 
--- Parasite - Hulu, Amazon Prime
+-- Parasite - Hulu, Prime Video
 INSERT INTO movie_streaming_sites (movie_id, streaming_site_id)
 SELECT m.id, s.id 
 FROM movies m
 CROSS JOIN streaming_sites s
 WHERE m.name = 'Parasite'
-  AND s.name IN ('Hulu', 'Amazon Prime Video')
+  AND s.name IN ('Hulu', 'Prime Video')
 ON CONFLICT DO NOTHING;
 
--- The Lord of the Rings: The Return of the King - HBO Max
+-- The Lord of the Rings: The Return of the King - Max
 INSERT INTO movie_streaming_sites (movie_id, streaming_site_id)
 SELECT m.id, s.id 
 FROM movies m
 CROSS JOIN streaming_sites s
 WHERE m.name = 'The Lord of the Rings: The Return of the King'
-  AND s.name = 'HBO Max'
+  AND s.name = 'Max'
 ON CONFLICT DO NOTHING;
 
--- Oppenheimer - Amazon Prime
+-- Oppenheimer - Prime Video
 INSERT INTO movie_streaming_sites (movie_id, streaming_site_id)
 SELECT m.id, s.id 
 FROM movies m
 CROSS JOIN streaming_sites s
 WHERE m.name = 'Oppenheimer'
-  AND s.name = 'Amazon Prime Video'
+  AND s.name = 'Prime Video'
 ON CONFLICT DO NOTHING;
 
 -- The Avengers - Disney+
@@ -118,16 +118,15 @@ WHERE m.name = 'Spider-Man: Across the Spider-Verse'
   AND s.name = 'Netflix'
 ON CONFLICT DO NOTHING;
 
--- Dune - HBO Max
+-- Dune - Max
 INSERT INTO movie_streaming_sites (movie_id, streaming_site_id)
 SELECT m.id, s.id 
 FROM movies m
 CROSS JOIN streaming_sites s
 WHERE m.name = 'Dune'
-  AND s.name = 'HBO Max'
+  AND s.name = 'Max'
 ON CONFLICT DO NOTHING;
 
--- Everything Everywhere All at Once - Paramount+, Hulu
 INSERT INTO movie_streaming_sites (movie_id, streaming_site_id)
 SELECT m.id, s.id 
 FROM movies m
@@ -163,13 +162,13 @@ WHERE m.name = 'The Silence of the Lambs'
   AND s.name IN ('Netflix', 'HBO Max')
 ON CONFLICT DO NOTHING;
 
--- Gladiator - Paramount+, Amazon Prime
+-- Gladiator - Paramount+, Prime Video
 INSERT INTO movie_streaming_sites (movie_id, streaming_site_id)
 SELECT m.id, s.id 
 FROM movies m
 CROSS JOIN streaming_sites s
 WHERE m.name = 'Gladiator'
-  AND s.name IN ('Paramount+', 'Amazon Prime Video')
+  AND s.name IN ('Paramount+', 'Prime Video')
 ON CONFLICT DO NOTHING;
 
 -- The Social Network - Netflix, Hulu

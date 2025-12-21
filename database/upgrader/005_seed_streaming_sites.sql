@@ -4,7 +4,6 @@
 
 INSERT INTO streaming_sites (id, name, created_at) VALUES
   (gen_random_uuid(), 'Netflix', CURRENT_TIMESTAMP),
-  (gen_random_uuid(), 'HBO', CURRENT_TIMESTAMP),
   (gen_random_uuid(), 'Max', CURRENT_TIMESTAMP),
   (gen_random_uuid(), 'Prime Video', CURRENT_TIMESTAMP),
   (gen_random_uuid(), 'Disney+', CURRENT_TIMESTAMP),

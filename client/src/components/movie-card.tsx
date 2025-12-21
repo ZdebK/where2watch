@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
+import { Star } from 'lucide-react';
+import { ImageWithFallback } from './image-with-fallback';
 
 export interface Movie {
   id: string;
@@ -17,6 +19,7 @@ export interface Movie {
   language?: string;
   country?: string;
   isAvailable?: boolean;
+  createdAt?: Date;
 }
 
 interface MovieCardProps {
@@ -26,9 +29,12 @@ interface MovieCardProps {
 
 const platformIcons: Record<string, string> = {
   Netflix: 'N',
-  HBO: 'H',
-  'Prime Video': 'P',
+  Max: 'Max',
+  'Prime Video': 'Prime',
   'Disney+': 'D+',
+  'YouTube Premium': 'YT',
+  'Canal+ Online': 'C+',
+  'Apple TV+': 'Apple',
 };
 
 export function MovieCard({ movie, onEdit }: MovieCardProps) {
@@ -49,11 +55,34 @@ export function MovieCard({ movie, onEdit }: MovieCardProps) {
       onClick={() => onEdit(movie)}
     >
       <div className="aspect-[2/3] relative overflow-hidden bg-black/20">
-        <img
-          src={movie.posterUrl}
+        <ImageWithFallback
+          src={movie.posterUrl || undefined}
           alt={movie.title}
           className="w-full h-full object-cover"
         />
+        
+        {/* Rating Badge */}
+        {movie.score !== undefined && movie.score > 0 && (
+          <div
+            className="absolute top-2 right-2 flex items-center gap-2 px-2 py-1 rounded-md backdrop-blur-sm border hover:bg-orange/20 hover:border-orange/80 hover:shadow-[0_4px_12px_rgba(255,138,0,0.35)] transition-colors duration-200"
+            style={{
+              background: 'linear-gradient(135deg, rgba(10, 11, 20, 0.9), rgba(26, 29, 35, 0.92))',
+              borderColor: 'rgba(255, 138, 0, 0.6)',
+              boxShadow: '0 8px 20px rgba(0, 0, 0, 0.35)',
+            }}
+          >
+            <Star
+              size={14}
+              style={{ color: 'var(--w2w-orange)', fill: 'var(--w2w-orange)' }}
+            />
+            <span
+              className="text-sm font-semibold"
+              style={{ color: 'var(--w2w-pure-white)' }}
+            >
+              {Number(movie.score).toFixed(1)}
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="p-4">

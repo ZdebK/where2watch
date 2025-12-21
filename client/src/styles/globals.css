@@ -216,3 +216,103 @@ html {
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 138, 0, 0.4);
 }
+
+/* Utility classes to replace common inline styles */
+@layer utilities {
+  .bg-deep-navy { background-color: var(--w2w-deep-navy); }
+  .bg-graphite { background-color: var(--w2w-graphite); }
+  .bg-orange { background-color: var(--w2w-orange); }
+  .text-pure-white { color: var(--w2w-pure-white); }
+  .text-soft-gray { color: var(--w2w-soft-gray); }
+  .border-subtle { border-color: rgba(255, 255, 255, 0.1); }
+  .focus-orange-ring:focus-visible { box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.3); }
+
+  /* Chip styles for selectable pills */
+  .chip { background-color: var(--w2w-deep-navy); color: var(--w2w-soft-gray); border: 1px solid transparent; }
+  .chip-active {
+    background-color: var(--w2w-orange);
+    color: var(--w2w-pure-white);
+    border: 1px solid rgba(255, 138, 0, 0.7);
+    box-shadow: 0 0 0 1px rgba(255, 138, 0, 0.6), 0 6px 16px rgba(255, 138, 0, 0.25);
+  }
+
+  /* Hover affordances for interactive pills/buttons */
+  .chip:hover { background-color: rgba(255, 255, 255, 0.08); color: var(--w2w-pure-white); }
+  .chip-active:hover { background-color: #ffa733; box-shadow: 0 0 0 1px rgba(255, 138, 0, 0.75), 0 8px 18px rgba(255, 138, 0, 0.32); }
+
+  /* Custom chevron for selects */
+  .select-chevron {
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23B7B9C9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.65rem center;
+    background-size: 14px;
+    padding-right: 2.75rem;
+    color-scheme: dark;
+    background-color: var(--w2w-graphite);
+  }
+
+  .select-chevron option {
+    background-color: var(--w2w-deep-navy);
+    color: var(--w2w-soft-gray);
+  }
+
+  .select-chevron option:checked {
+    background-color: rgba(255, 138, 0, 0.16);
+    color: var(--w2w-pure-white);
+  }
+
+  .select-chevron:focus-visible {
+    border-color: rgba(255, 138, 0, 0.55);
+    box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.28);
+  }
+
+  /* Filter dropdown base + states */
+  .filter-select {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    outline: none;
+    font-size: 0.875rem;
+    min-width: 9.5rem;
+    background-color: var(--w2w-deep-navy);
+    color: var(--w2w-pure-white);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    color-scheme: dark;
+  }
+
+  .filter-select:hover {
+    background-color: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 138, 0, 0.35);
+  }
+
+  .filter-select:focus-visible {
+    border-color: rgba(255, 138, 0, 0.55);
+    box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.28);
+  }
+
+  .filter-select-active {
+    border-color: rgba(255, 138, 0, 0.7);
+    box-shadow: 0 0 0 1px rgba(255, 138, 0, 0.5);
+  }
+
+  .filter-select option {
+    background: var(--w2w-graphite);
+    color: var(--w2w-pure-white);
+  }
+
+  .filter-select option:checked,
+  .filter-select option:hover {
+    background: linear-gradient(135deg, rgba(255, 138, 0, 0.25), rgba(255, 138, 0, 0.15));
+    color: var(--w2w-pure-white);
+  }
+
+  .select-chevron:hover,
+  .select-chevron:focus-visible {
+    background-image: url("data:image/svg+xml,%3Csvg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' xmlns='http://www.w3.org/2000/svg'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-color: rgba(255, 255, 255, 0.06);
+    /* keep border as-is to match platform hover behavior */
+  }
+}
