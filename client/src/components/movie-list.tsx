@@ -5,24 +5,24 @@ import { MovieCard, Movie } from './movie-card';
 import { AddEditModal } from './add-edit-modal';
 import { useAuth } from '../contexts/auth.context';
 import { useStreamingSites } from '../contexts/streaming-sites.context';
-import { useApiCall } from '../hooks/useApiCall';
 import { apiClient, MovieDTO } from '../api/client';
 import { toast } from 'sonner';
 
 export function MovieList() {
   const { user, logout } = useAuth();
   const { streamingSites: platforms } = useStreamingSites();
+  const PAGE_SIZE = 10;
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeTab, setActiveTab] = useState<'all' | 'movies' | 'series'>('all');
   const [activePlatforms, setActivePlatforms] = useState<string[]>([]);
   const [activeGenre, setActiveGenre] = useState<string>('all');
   const [sortBy, setSortBy] = useState<'popular' | 'latest' | 'a-z'>('popular');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
   const [movies, setMovies] = useState<Movie[]>([]);
-  const hasFetchedMovies = useRef(false);
-
-  const fetchMovies = useCallback(() => apiClient.getAllMovies(), []);
+  const [offset, setOffset] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   const convertDtoToMovie = useCallback((dto: MovieDTO): Movie => {
     return {
@@ -45,31 +45,40 @@ export function MovieList() {
     };
   }, []);
 
-  const handleMoviesError = useCallback((err: Error) => {
-    console.error('[MovieList] fetch failed', err);
-  }, []);
+  const loadPage = useCallback(async (nextOffset: number) => {
+    try {
+      setIsLoadingMore(true);
+      const moviesFromApi = await apiClient.getAllMovies(PAGE_SIZE, nextOffset);
+      const convertedMovies = moviesFromApi.map(convertDtoToMovie);
 
-  const handleMoviesSuccess = useCallback((moviesFromApi: MovieDTO[]) => {
-    const convertedMovies = moviesFromApi.map(convertDtoToMovie);
-    setMovies(convertedMovies);
-  }, [convertDtoToMovie]);
+      setMovies((prev) => {
+        if (nextOffset === 0) {
+          return convertedMovies;
+        }
+        const map = new Map(prev.map((m) => [m.id, m]));
+        convertedMovies.forEach((m) => map.set(m.id, m));
+        return Array.from(map.values());
+      });
 
-  // Load movies using useApiCall
-  const { isLoading: isLoadingMovies, execute: loadMovies } = useApiCall(
-    fetchMovies,
-    {
-      errorMessage: 'Failed to load movies from server',
-      onError: handleMoviesError,
-      onSuccess: handleMoviesSuccess,
+      setHasMore(moviesFromApi.length === PAGE_SIZE);
+    } catch (err) {
+      console.error('[MovieList] fetch failed', err);
+      toast.error('Failed to load movies from server');
+    } finally {
+      setIsLoadingMore(false);
     }
-  );
+  }, [convertDtoToMovie, PAGE_SIZE]);
 
-  // Load movies on mount
+  // Load first page
   useEffect(() => {
-    if (hasFetchedMovies.current) return;
-    hasFetchedMovies.current = true;
-    loadMovies();
-  }, [loadMovies]);
+    loadPage(0);
+  }, [loadPage]);
+
+  // Load next page when offset changes (after initial)
+  useEffect(() => {
+    if (offset === 0) return;
+    loadPage(offset);
+  }, [offset, loadPage]);
 
   const genres = ['all', 'Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Thriller', 'Romance', 'Adventure'];
 
@@ -107,11 +116,29 @@ export function MovieList() {
     return filtered;
   }, [movies, searchQuery, activePlatforms, activeGenre, sortBy]);
 
-  const togglePlatform = (platform: string) => {
-    setActivePlatforms((prev) =>
-      prev.includes(platform) ? prev.filter((p) => p !== platform) : [...prev, platform]
-    );
-  };
+  // Infinite scroll: trigger backend pagination when sentinel enters view
+  const loadMoreMovies = useCallback(() => {
+    if (!hasMore) return;
+    if (isLoadingMore) return;
+    setOffset((current) => current + PAGE_SIZE);
+  }, [hasMore, isLoadingMore, PAGE_SIZE]);
+
+  useEffect(() => {
+    const sentinel = loadMoreRef.current;
+    if (!sentinel) return;
+    if (!hasMore) return;
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          loadMoreMovies();
+        }
+      });
+    }, { rootMargin: '200px 0px 200px 0px' });
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [loadMoreMovies, hasMore]);
 
   const handleSaveMovie = async (movieData: Omit<Movie, 'id'> & { id?: string }) => {
     const requestData = {
@@ -174,75 +201,56 @@ export function MovieList() {
         }}
       >
         <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Logo className="text-2xl" />
+          <div className="flex items-center justify-between w-full">
+            <Logo />
 
-            {/* Search Bar */}
-            <div className="relative flex-1 max-w-md mx-8">
-              <Search
-                size={20}
-                className="absolute left-4 top-1/2 -translate-y-1/2"
-                style={{ color: 'var(--w2w-soft-gray)' }}
-              />
-              <input
-                type="text"
-                placeholder="Szukaj filmów lub seriali…"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-12 pr-4 py-2 rounded-lg outline-none transition-all"
+            <div className="flex items-center gap-4">
+              {/* Search Bar */}
+              <div className="relative w-64 md:w-80">
+                <Search
+                  size={20}
+                  className="absolute left-4 top-1/2 -translate-y-1/2"
+                  style={{ color: 'var(--w2w-soft-gray)' }}
+                />
+                <input
+                  type="text"
+                  placeholder="Search movies…"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full pl-12 pr-4 py-2 rounded-lg outline-none transition-all"
+                  style={{
+                    backgroundColor: 'var(--w2w-deep-navy)',
+                    color: 'var(--w2w-pure-white)',
+                  }}
+                  onFocus={(e) => {
+                    e.target.style.boxShadow = '0 0 0 2px rgba(255, 138, 0, 0.3)';
+                  }}
+                  onBlur={(e) => {
+                    e.target.style.boxShadow = 'none';
+                  }}
+                />
+              </div>
+
+              {/* Logout Button */}
+              <button
+                onClick={logout}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all"
                 style={{
-                  backgroundColor: 'var(--w2w-deep-navy)',
+                  backgroundColor: 'rgba(255, 255, 255, 0.1)',
                   color: 'var(--w2w-pure-white)',
                 }}
-                onFocus={(e) => {
-                  e.target.style.boxShadow = '0 0 0 2px rgba(255, 138, 0, 0.3)';
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 138, 0, 0.2)';
                 }}
-                onBlur={(e) => {
-                  e.target.style.boxShadow = 'none';
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
                 }}
-              />
+                title={`Logged in as: ${user?.email}`}
+                aria-label="Logout"
+              >
+                <LogOut size={20} />
+              </button>
             </div>
-
-            {/* Add Movie Button */}
-            <button
-              onClick={handleAddNew}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all"
-              style={{
-                backgroundColor: 'var(--w2w-orange)',
-                color: 'var(--w2w-pure-white)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-1px)';
-                e.currentTarget.style.boxShadow = '0 4px 12px rgba(255, 138, 0, 0.3)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)';
-                e.currentTarget.style.boxShadow = 'none';
-              }}
-            >
-              <Plus size={20} />
-              Add Movie
-            </button>
-
-            {/* Logout Button */}
-            <button
-              onClick={logout}
-              className="flex items-center gap-2 px-4 py-2 rounded-lg transition-all ml-4"
-              style={{
-                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                color: 'var(--w2w-pure-white)',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 138, 0, 0.2)';
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
-              }}
-              title={`Logged in as: ${user?.email}`}
-            >
-              <LogOut size={20} />
-              Logout
-            </button>
           </div>
         </div>
       </header>
@@ -256,23 +264,6 @@ export function MovieList() {
         }}
       >
         <div className="container mx-auto px-6 py-4">
-          {/* Navigation Tabs */}
-          <div className="flex items-center gap-6 mb-4">
-            {(['all', 'movies', 'series'] as const).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className="pb-2 transition-all capitalize"
-                style={{
-                  color: activeTab === tab ? 'var(--w2w-orange)' : 'var(--w2w-soft-gray)',
-                  borderBottom: activeTab === tab ? '2px solid var(--w2w-orange)' : '2px solid transparent',
-                }}
-              >
-                {tab}
-              </button>
-            ))}
-          </div>
-
           {/* Platform Filters */}
           <div className="flex flex-wrap items-center gap-3 mb-4">
             <span style={{ color: 'var(--w2w-soft-gray)' }}>Platforms:</span>
@@ -332,7 +323,7 @@ export function MovieList() {
 
       {/* Movie Grid */}
       <div className="container mx-auto px-6 py-8">
-        {isLoadingMovies ? (
+        {movies.length === 0 && isLoadingMore ? (
           <div className="text-center py-20">
             <p style={{ color: 'var(--w2w-soft-gray)' }}>Loading movies...</p>
           </div>
@@ -355,11 +346,45 @@ export function MovieList() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
-            {filteredMovies.map((movie) => (
-              <MovieCard key={movie.id} movie={movie} onEdit={handleEditMovie} />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+              {/* Add Movie Card */}
+              <div
+                className="rounded-lg overflow-hidden cursor-pointer transition-all duration-300 flex flex-col items-center justify-center gap-4"
+                style={{
+                  backgroundColor: 'rgba(255, 138, 0, 0.05)',
+                  border: '2px dashed rgba(255, 138, 0, 0.5)',
+                }}
+                onClick={handleAddNew}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 138, 0, 0.12)';
+                  e.currentTarget.style.transform = 'translateY(-4px)';
+                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(255, 138, 0, 0.2)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = 'rgba(255, 138, 0, 0.05)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                  e.currentTarget.style.boxShadow = 'none';
+                }}
+              >
+                <h3 style={{ color: 'var(--w2w-orange)', opacity: 0.75 }} className="text-lg font-semibold">
+                  ADD MOVIE
+                </h3>
+                <Plus size={64} style={{ color: 'var(--w2w-orange)', opacity: 0.5 }} />
+              </div>
+
+              {filteredMovies.map((movie) => (
+                <MovieCard key={movie.id} movie={movie} onEdit={handleEditMovie} />
+              ))}
+            </div>
+
+            {hasMore && (
+              <div ref={loadMoreRef} className="h-1 w-full" aria-hidden="true" />
+            )}
+            <div className="text-center text-sm mt-4" style={{ color: 'var(--w2w-soft-gray)', opacity: 0.5 }}>
+              {isLoadingMore ? 'Loading more…' : hasMore ? 'Scroll to load more' : 'All movies loaded'}
+            </div>
+          </>
         )}
       </div>
 

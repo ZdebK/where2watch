@@ -80,8 +80,13 @@ class ApiClient {
   }
 
   // Movie endpoints
-  async getAllMovies(): Promise<MovieDTO[]> {
-    return this.request<MovieDTO[]>('/movies');
+  async getAllMovies(limit?: number, offset?: number): Promise<MovieDTO[]> {
+    const params = new URLSearchParams();
+    if (typeof limit === 'number') params.append('limit', String(limit));
+    if (typeof offset === 'number') params.append('offset', String(offset));
+    const query = params.toString();
+    const endpoint = query ? `/movies?${query}` : '/movies';
+    return this.request<MovieDTO[]>(endpoint);
   }
 
   async getMovieById(id: string): Promise<MovieDTO> {

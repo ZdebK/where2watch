@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
   HttpStatus,
   HttpException,
 } from '@nestjs/common';
@@ -18,9 +19,14 @@ export class MoviesController {
   constructor(private readonly moviesService: MoviesService) {}
 
   @Get()
-  async getAllMovies(): Promise<Movie[]> {
+  async getAllMovies(
+    @Query('limit') limit?: string,
+    @Query('offset') offset?: string,
+  ): Promise<Movie[]> {
     try {
-      return await this.moviesService.getAllMovies();
+      const take = limit ? Number(limit) : undefined;
+      const skip = offset ? Number(offset) : undefined;
+      return await this.moviesService.getAllMovies(take, skip);
     } catch (error) {
       console.error('Error fetching movies:', error);
       throw new HttpException('Failed to fetch movies', HttpStatus.INTERNAL_SERVER_ERROR);

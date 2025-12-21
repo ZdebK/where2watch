@@ -45,12 +45,17 @@ export class MoviesService {
     private streamingSiteRepository: Repository<StreamingSite>,
   ) {}
 
-  async getAllMovies(): Promise<Movie[]> {
+  async getAllMovies(limit = 10, offset = 0): Promise<Movie[]> {
+    const take = Math.min(Math.max(limit, 1), 100);
+    const skip = Math.max(offset, 0);
+
     return await this.movieRepository.find({
       relations: ['streamingSites'],
       order: {
         createdAt: 'DESC',
       },
+      take,
+      skip,
     });
   }
 
