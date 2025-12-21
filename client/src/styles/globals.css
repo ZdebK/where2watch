@@ -227,6 +227,11 @@ html {
   .border-subtle { border-color: rgba(255, 255, 255, 0.1); }
   .focus-orange-ring:focus-visible { box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.3); }
 
+  /* Modal background gradient */
+  .modal-gradient {
+    background: linear-gradient(135deg, var(--w2w-graphite) 0%, var(--w2w-dark-violet) 100%);
+  }
+
   /* Chip styles for selectable pills */
   .chip { background-color: var(--w2w-deep-navy); color: var(--w2w-soft-gray); border: 1px solid transparent; }
   .chip-active {

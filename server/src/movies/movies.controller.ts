@@ -9,6 +9,7 @@ import {
   Query,
   HttpStatus,
   HttpException,
+  HttpCode,
 } from '@nestjs/common';
 import { MoviesService, CreateMovieDto, UpdateMovieDto } from './movies.service';
 import { Movie } from '../entities/movie.entity';
@@ -99,6 +100,7 @@ export class MoviesController {
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deleteMovie(@Param('id') id: string): Promise<void> {
     try {
       const success = await this.moviesService.deleteMovie(id);

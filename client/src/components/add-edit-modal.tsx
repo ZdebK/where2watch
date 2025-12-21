@@ -1,4 +1,5 @@
-import { X } from 'lucide-react';
+import React, { useState } from 'react';
+import { X, Trash2 } from 'lucide-react';
 import { Movie } from './movie-card';
 import { useStreamingSites } from '../contexts/streaming-sites.context';
 import { useMovieForm } from '../hooks/useMovieForm';
@@ -11,25 +12,30 @@ interface AddEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (movie: Omit<Movie, 'id'> & { id?: string }) => void;
+  onDelete?: (movieId: string) => void;
   movie?: Movie | null;
 }
 
 const genres = ['Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Thriller', 'Romance', 'Adventure'];
 const ratings = ['G', 'PG', 'PG-13', 'R', 'NC-17'];
 
-export function AddEditModal({ isOpen, onClose, onSave, movie }: AddEditModalProps) {
+export function AddEditModal({ isOpen, onClose, onSave, onDelete, movie }: AddEditModalProps) {
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
   const { streamingSites: platforms, isLoading: isPlatformsLoading } = useStreamingSites();
-  const { formData, errors, updateField, togglePlatform, handleSubmit, resetForm } = useMovieForm(movie, isOpen);
+  const { formData, errors, updateField, togglePlatform, handleSubmit, resetForm, isValid } = useMovieForm(movie, isOpen);
 
   const handleClose = () => {
+    setIsConfirmOpen(false);
     resetForm();
     onClose();
   };
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    handleSubmit(onSave, movie?.id);
-    onClose();
+    const isSuccess = handleSubmit(onSave, movie?.id);
+    if (isSuccess) {
+      onClose();
+    }
   };
 
   if (!isOpen) return null;
@@ -41,10 +47,7 @@ export function AddEditModal({ isOpen, onClose, onSave, movie }: AddEditModalPro
       onClick={handleClose}
     >
       <div
-        className="w-full max-w-2xl rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200"
-        style={{
-          background: `linear-gradient(135deg, var(--w2w-graphite) 0%, var(--w2w-dark-violet) 100%)`,
-        }}
+        className="w-full max-w-2xl rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 modal-gradient"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -89,9 +92,11 @@ export function AddEditModal({ isOpen, onClose, onSave, movie }: AddEditModalPro
           <div className="grid grid-cols-3 gap-4">
             <FormInput
               label="Release date"
+              required
               type="date"
               value={formData.releaseDate}
               onChange={(e) => updateField('releaseDate', e.target.value)}
+              error={errors.releaseDate}
             />
             <FormInput
               label="Duration (min)"
@@ -119,9 +124,11 @@ export function AddEditModal({ isOpen, onClose, onSave, movie }: AddEditModalPro
           <div className="grid grid-cols-2 gap-4">
             <FormSelect
               label="Genre"
+              required
               value={formData.genre}
               onChange={(e) => updateField('genre', e.target.value)}
               options={genres.map(g => ({ value: g, label: g }))}
+              error={errors.genre}
             />
             <FormSelect
               label="Age rating"
@@ -137,7 +144,7 @@ export function AddEditModal({ isOpen, onClose, onSave, movie }: AddEditModalPro
               label="Language"
               value={formData.language}
               onChange={(e) => updateField('language', e.target.value)}
-              placeholder="Polski, English, etc."
+              placeholder="Polish, English, etc."
             />
             <FormInput
               label="Country of origin"
@@ -171,43 +178,88 @@ export function AddEditModal({ isOpen, onClose, onSave, movie }: AddEditModalPro
             isLoading={isPlatformsLoading}
             error={errors.streamingSites}
           />
-
-          {/* Is Available Checkbox */}
-          <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              id="isAvailable"
-              checked={formData.isAvailable}
-              onChange={(e) => updateField('isAvailable', e.target.checked)}
-              className="w-5 h-5 rounded cursor-pointer"
-              style={{
-                accentColor: 'var(--w2w-orange)',
-              }}
-            />
-            <label htmlFor="isAvailable" style={{ color: 'var(--w2w-pure-white)' }} className="cursor-pointer">
-              Movie is available
-            </label>
-          </div>
         </form>
 
         {/* Footer */}
         <div
-          className="flex items-center justify-end gap-3 p-6 border-t"
+          className="flex items-center justify-between gap-3 p-6 border-t"
           style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}
         >
-          <button
-            type="button"
-            onClick={handleClose}
-            className="btn btn-secondary"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onSubmit}
-            className="btn btn-primary"
-          >
-            {movie ? 'Save Changes' : 'Add Movie'}
-          </button>
+          {/* Archive button - only for existing movies */}
+          {movie && onDelete && (
+            <div className="relative">
+              <button
+                type="button"
+                onClick={() => setIsConfirmOpen((open) => !open)}
+                className="btn btn-danger flex items-center"
+                title="Archive movie"
+              >
+                <Trash2 size={18} className="mr-2" />
+                Archive
+              </button>
+
+              {isConfirmOpen && (
+                <div
+                  className="absolute right-0 rounded-lg shadow-lg border"
+                  style={{
+                    background: 'var(--w2w-graphite)',
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    minWidth: '240px',
+                    zIndex: 50,
+                    bottom: 'calc(100% + 14px)',
+                  }}
+                >
+                  <div className="p-4 space-y-3">
+                    <p className="text-sm" style={{ color: 'var(--w2w-pure-white)' }}>
+                      Archive this movie? It will be hidden from the list.
+                    </p>
+                    <div
+                      className="flex justify-end gap-3"
+                      style={{ marginTop: '16px' }}
+                    >
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-compact"
+                        onClick={() => setIsConfirmOpen(false)}
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-danger btn-compact"
+                        onClick={() => {
+                          onDelete(movie.id);
+                          setIsConfirmOpen(false);
+                          onClose();
+                        }}
+                      >
+                        Yes, archive
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          
+          <div className="flex items-center gap-3 ml-auto">
+            <button
+              type="button"
+              onClick={handleClose}
+              className="btn btn-secondary"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              onClick={onSubmit}
+              disabled={!isValid}
+              className="btn btn-primary"
+              title={!isValid ? 'Please fill in all required fields' : ''}
+            >
+              {movie ? 'Save Changes' : 'Add Movie'}
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -40,6 +40,10 @@ export function useMovies() {
     setMovies((prev) => [...prev, newMovie]);
   }, [setMovies]);
 
+  const removeMovie = useCallback((movieId: string) => {
+    setMovies((prev) => prev.filter((m) => m.id !== movieId));
+  }, [setMovies]);
+
   return {
     movies,
     isLoadingMore,
@@ -48,6 +52,7 @@ export function useMovies() {
     loadMore,
     updateMovie,
     addMovie,
+    removeMovie,
     refetch,
   };
 }

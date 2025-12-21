@@ -29,6 +29,11 @@
   transform: translateY(1px);
 }
 
+.btn-compact {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.875rem;
+}
+
 .btn-secondary {
   background-color: var(--w2w-deep-navy);
   color: var(--w2w-soft-gray);

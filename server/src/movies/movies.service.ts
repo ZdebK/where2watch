@@ -50,6 +50,7 @@ export class MoviesService {
     const skip = Math.max(offset, 0);
 
     return await this.movieRepository.find({
+      where: { isAvailable: true },
       relations: ['streamingSites'],
       order: {
         createdAt: 'DESC',
@@ -124,7 +125,8 @@ export class MoviesService {
   }
 
   async deleteMovie(id: string): Promise<boolean> {
-    const result = await this.movieRepository.delete(id);
+    // Soft delete by flagging the movie as unavailable
+    const result = await this.movieRepository.update({ id }, { isAvailable: false });
     return result.affected ? result.affected > 0 : false;
   }
 

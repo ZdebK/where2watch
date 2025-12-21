@@ -15,7 +15,7 @@ import { convertDtoToMovie } from '../utils/movie.utils';
 export function MovieList() {
   const { user, logout } = useAuth();
   const { streamingSites: platforms } = useStreamingSites();
-  const { movies, isLoadingMore, hasMore, loadMoreRef, loadMore, updateMovie, addMovie, refetch } = useMovies();
+  const { movies, isLoadingMore, hasMore, loadMoreRef, loadMore, updateMovie, addMovie, removeMovie, refetch } = useMovies();
   const {
     filteredMovies,
     searchQuery,
@@ -74,6 +74,17 @@ export function MovieList() {
     } catch (error) {
       console.error('Failed to save movie:', error);
       toast.error('Failed to save movie');
+    }
+  };
+
+  const handleDeleteMovie = async (movieId: string) => {
+    try {
+      await apiClient.deleteMovie(movieId);
+      removeMovie(movieId);
+      toast.success('Movie archived successfully');
+    } catch (error) {
+      console.error('Failed to archive movie:', error);
+      toast.error('Failed to archive movie');
     }
   };
 
@@ -141,6 +152,7 @@ export function MovieList() {
           setEditingMovie(null);
         }}
         onSave={handleSaveMovie}
+        onDelete={handleDeleteMovie}
         movie={editingMovie}
       />
     </div>

@@ -68,11 +68,18 @@ class ApiClient {
         throw new Error(error.error || `HTTP ${response.status}: ${response.statusText}`);
       }
 
-      if (response.status === 204) {
+      // Handle empty responses gracefully (204, 205, or no body)
+      const contentLength = response.headers.get('content-length');
+      if (response.status === 204 || response.status === 205 || contentLength === '0') {
         return null as T;
       }
 
-      return await response.json();
+      const text = await response.text();
+      if (!text) {
+        return null as T;
+      }
+
+      return JSON.parse(text) as T;
     } catch (error) {
       console.error(`API request failed: ${endpoint}`, error);
       throw error;

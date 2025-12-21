@@ -42,8 +42,9 @@ interface UseMovieFormReturn {
   errors: Record<string, string>;
   updateField: <K extends keyof FormData>(field: K, value: FormData[K]) => void;
   togglePlatform: (platform: string) => void;
-  handleSubmit: (onSave: (movie: Omit<Movie, 'id'> & { id?: string }) => void, movieId?: string) => void;
+  handleSubmit: (onSave: (movie: Omit<Movie, 'id'> & { id?: string }) => void, movieId?: string) => boolean;
   resetForm: () => void;
+  isValid: boolean;
 }
 
 export function useMovieForm(movie: Movie | null | undefined, isOpen: boolean): UseMovieFormReturn {
@@ -93,16 +94,23 @@ export function useMovieForm(movie: Movie | null | undefined, isOpen: boolean): 
     setErrors({});
   };
 
-  const handleSubmit = (onSave: (movie: Omit<Movie, 'id'> & { id?: string }) => void, movieId?: string) => {
+  const isValid = 
+    formData.title.trim() !== '' &&
+    formData.posterUrl.trim() !== '' &&
+    formData.genre.trim() !== '' &&
+    formData.releaseDate.trim() !== '';
+
+  const handleSubmit = (onSave: (movie: Omit<Movie, 'id'> & { id?: string }) => void, movieId?: string): boolean => {
     const newErrors: Record<string, string> = {};
 
     if (!formData.title.trim()) newErrors.title = 'Title is required';
     if (!formData.posterUrl.trim()) newErrors.posterUrl = 'Poster is required';
-    if (formData.streamingSites.length === 0) newErrors.streamingSites = 'At least one streaming site is required';
+    if (!formData.genre.trim()) newErrors.genre = 'Genre is required';
+    if (!formData.releaseDate.trim()) newErrors.releaseDate = 'Release date is required';
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
-      return;
+      return false;
     }
 
     onSave({
@@ -125,6 +133,7 @@ export function useMovieForm(movie: Movie | null | undefined, isOpen: boolean): 
     });
 
     resetForm();
+    return true;
   };
 
   return {
@@ -134,5 +143,6 @@ export function useMovieForm(movie: Movie | null | undefined, isOpen: boolean): 
     togglePlatform,
     handleSubmit,
     resetForm,
+    isValid,
   };
 }
