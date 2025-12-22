@@ -1,7 +1,8 @@
-import { AppDataSource } from '../config/database';
+import dotenv from 'dotenv';
 import * as fs from 'fs';
 import * as path from 'path';
-import dotenv from 'dotenv';
+
+import { AppDataSource } from '../config/database';
 
 // Load environment variables from .env file
 dotenv.config();

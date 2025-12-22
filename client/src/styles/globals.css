@@ -217,15 +217,31 @@ html {
   background: rgba(255, 138, 0, 0.4);
 }
 
+/* Firefox/standard scrollbar tweaks for custom-scrollbar */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+}
+
 /* Utility classes to replace common inline styles */
 @layer utilities {
   .bg-deep-navy { background-color: var(--w2w-deep-navy); }
   .bg-graphite { background-color: var(--w2w-graphite); }
   .bg-orange { background-color: var(--w2w-orange); }
+  .bg-orange-soft { background-color: rgba(255, 138, 0, 0.15); }
+  .bg-orange-tint { background-color: rgba(255, 138, 0, 0.05); }
+  .text-orange { color: var(--w2w-orange); }
+  .text-orange-soft { color: #ffba7a; }
+  .fill-orange { fill: var(--w2w-orange); }
   .text-pure-white { color: var(--w2w-pure-white); }
   .text-soft-gray { color: var(--w2w-soft-gray); }
   .border-subtle { border-color: rgba(255, 255, 255, 0.1); }
+  .border-orange-soft { border-color: rgba(255, 138, 0, 0.6); }
+  .border-orange-strong { border-color: rgba(255, 138, 0, 0.5); }
+  .border-t-orange { border-top-color: var(--w2w-orange); }
+  .border-t-soft-white { border-top-color: rgba(255, 255, 255, 0.4); }
   .focus-orange-ring:focus-visible { box-shadow: 0 0 0 2px rgba(255, 138, 0, 0.3); }
+  .modal-overlay { background-color: rgba(11, 13, 26, 0.8); }
 
   /* Modal background gradient */
   .modal-gradient {

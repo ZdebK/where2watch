@@ -1,16 +1,3 @@
-interface MovieListFiltersProps {
-  platforms: string[];
-  activePlatforms: string[];
-  onTogglePlatform: (platform: string) => void;
-  genres: string[];
-  activeGenre: string;
-  onGenreChange: (genre: string) => void;
-  yearRange: 'all' | 'last-5' | 'last-10' | '2000s' | '90s' | '80s' | 'older';
-  onYearRangeChange: (range: 'all' | 'last-5' | 'last-10' | '2000s' | '90s' | '80s' | 'older') => void;
-  sortBy: 'popular' | 'latest' | 'a-z' | 'rating' | 'newest';
-  onSortChange: (sort: 'popular' | 'latest' | 'a-z' | 'rating' | 'newest') => void;
-}
-
 const YEAR_RANGES = [
   { value: 'all' as const, label: 'All Years' },
   { value: 'last-5' as const, label: 'Last 5 years' },
@@ -21,6 +8,8 @@ const YEAR_RANGES = [
   { value: 'older' as const, label: 'Before 1980' },
 ];
 
+type YearRange = typeof YEAR_RANGES[number]['value'];
+
 const SORT_OPTIONS = [
   { value: 'popular' as const, label: 'Popular' },
   { value: 'latest' as const, label: 'Latest Release' },
@@ -28,6 +17,21 @@ const SORT_OPTIONS = [
   { value: 'rating' as const, label: 'Highest Rated' },
   { value: 'a-z' as const, label: 'A–Z' },
 ];
+
+type SortOption = typeof SORT_OPTIONS[number]['value'];
+
+interface MovieListFiltersProps {
+  platforms: string[];
+  activePlatforms: string[];
+  onTogglePlatform: (platform: string) => void;
+  genres: string[];
+  activeGenre: string;
+  onGenreChange: (genre: string) => void;
+  yearRange: YearRange;
+  onYearRangeChange: (range: YearRange) => void;
+  sortBy: SortOption;
+  onSortChange: (sort: SortOption) => void;
+}
 
 export function MovieListFilters({
   platforms,
@@ -84,7 +88,7 @@ export function MovieListFilters({
             <div>
               <select
                 value={yearRange}
-                onChange={(e) => onYearRangeChange(e.target.value as MovieListFiltersProps['yearRange'])}
+                onChange={(e) => onYearRangeChange(e.target.value as YearRange)}
                 className={`filter-select select-chevron ${
                   yearRange !== 'all' ? 'filter-select-active' : ''
                 }`}
@@ -102,7 +106,7 @@ export function MovieListFilters({
             <span className="text-soft-gray text-sm">Sort:</span>
             <select
               value={sortBy}
-              onChange={(e) => onSortChange(e.target.value as 'popular' | 'latest' | 'a-z' | 'rating' | 'newest')}
+              onChange={(e) => onSortChange(e.target.value as SortOption)}
               className={`filter-select select-chevron ${
                 sortBy !== 'popular' ? 'filter-select-active' : ''
               }`}

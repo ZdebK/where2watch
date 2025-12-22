@@ -3,9 +3,10 @@ import logoImage from '../assets/where2watch-logo.png';
 interface LogoProps {
   onClick?: () => void;
   className?: string;
+  maxHeight?: number; // pixels
 }
 
-export function Logo({ onClick, className = '' }: LogoProps) {
+export function Logo({ onClick, className = '', maxHeight = 42 }: LogoProps) {
   return (
     <div
       onClick={onClick}
@@ -14,8 +15,8 @@ export function Logo({ onClick, className = '' }: LogoProps) {
       <img 
         src={logoImage} 
         alt="Where2Watch" 
-        className="h-9 w-auto object-contain"
-        style={{ maxHeight: '42px' }}
+        className="w-auto object-contain"
+        style={{ maxHeight: `${maxHeight}px`, height: 'auto' }}
       />
     </div>
   );

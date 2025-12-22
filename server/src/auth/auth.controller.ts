@@ -7,6 +7,7 @@ import {
   Get,
   Headers,
 } from '@nestjs/common';
+
 import { AuthService, LoginDto, RegisterDto, AuthResponse } from './auth.service';
 
 @Controller('api/auth')

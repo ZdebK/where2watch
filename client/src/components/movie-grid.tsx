@@ -27,7 +27,7 @@ export function MovieGrid({
   if (isEmpty && isLoadingMore) {
     return (
       <div className="text-center py-20">
-        <p style={{ color: 'var(--w2w-soft-gray)' }}>Loading movies...</p>
+        <p className="text-soft-gray">Loading movies...</p>
       </div>
     );
   }
@@ -35,7 +35,7 @@ export function MovieGrid({
   if (movies.length === 0) {
     return (
       <div className="text-center py-20">
-        <p style={{ color: 'var(--w2w-soft-gray)' }} className="mb-4">
+        <p className="mb-4 text-soft-gray">
           {emptyMessage}
         </p>
         {isEmpty && (
@@ -55,30 +55,16 @@ export function MovieGrid({
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         {/* Add Movie Card */}
         <div
-          className="rounded-lg overflow-hidden cursor-pointer transition-all duration-300 flex flex-col items-center justify-center gap-4"
-          style={{
-            backgroundColor: 'rgba(255, 138, 0, 0.05)',
-            border: '2px dashed rgba(255, 138, 0, 0.5)',
-          }}
+          className="rounded-lg overflow-hidden cursor-pointer transition-all duration-300 flex flex-col items-center justify-center gap-4 bg-orange-tint border-2 border-dashed border-orange-strong hover:bg-[rgba(255,138,0,0.12)] hover:-translate-y-1 hover:shadow-[0_8px_24px_rgba(255,138,0,0.2)]"
           onClick={onAddNew}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(255, 138, 0, 0.12)';
-            e.currentTarget.style.transform = 'translateY(-4px)';
-            e.currentTarget.style.boxShadow = '0 8px 24px rgba(255, 138, 0, 0.2)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.backgroundColor = 'rgba(255, 138, 0, 0.05)';
-            e.currentTarget.style.transform = 'translateY(0)';
-            e.currentTarget.style.boxShadow = 'none';
-          }}
         >
           <h3
-            style={{ color: 'var(--w2w-orange)', opacity: 0.75 }}
-            className="text-lg font-semibold"
+            className="text-lg font-semibold text-orange"
+            style={{ opacity: 0.75 }}
           >
             ADD MOVIE
           </h3>
-          <Plus size={64} style={{ color: 'var(--w2w-orange)', opacity: 0.5 }} />
+          <Plus size={64} className="text-orange" style={{ opacity: 0.5 }} />
         </div>
 
         {movies.map((movie) => (
@@ -101,8 +87,8 @@ export function MovieGrid({
       )}
       
       <div
-        className="text-center text-sm mt-4"
-        style={{ color: 'var(--w2w-soft-gray)', opacity: 0.5 }}
+        className="text-center text-sm mt-4 text-soft-gray"
+        style={{ opacity: 0.5 }}
       >
         {isLoadingMore ? 'Loading more…' : hasMore ? 'Scroll or click “Load more”' : 'All movies loaded'}
       </div>

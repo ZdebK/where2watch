@@ -22,7 +22,7 @@ export function StarRating({ value, onChange, max = 10 }: StarRatingProps) {
             ★
           </button>
         ))}
-        <span className="ml-4 text-base" style={{ color: 'var(--w2w-soft-gray)' }}>
+        <span className="ml-4 text-base text-soft-gray">
           {value}/{max}
         </span>
       </div>

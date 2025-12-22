@@ -7,6 +7,7 @@ import { FormInput, FormTextarea, FormSelect } from './form-input';
 import { StarRating } from './star-rating';
 import { StreamingSitesPicker } from './streaming-sites-picker';
 import { PosterUpload } from './poster-upload';
+import { GENRES } from '../data/genres';
 
 interface AddEditModalProps {
   isOpen: boolean;
@@ -16,7 +17,6 @@ interface AddEditModalProps {
   movie?: Movie | null;
 }
 
-const genres = ['Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Thriller', 'Romance', 'Adventure'];
 const ratings = ['G', 'PG', 'PG-13', 'R', 'NC-17'];
 
 export function AddEditModal({ isOpen, onClose, onSave, onDelete, movie }: AddEditModalProps) {
@@ -42,17 +42,16 @@ export function AddEditModal({ isOpen, onClose, onSave, onDelete, movie }: AddEd
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200"
-      style={{ backgroundColor: 'rgba(11, 13, 26, 0.8)' }}
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200 modal-overlay"
       onClick={handleClose}
     >
       <div
-        className="w-full max-w-2xl rounded-xl overflow-hidden shadow-2xl animate-in zoom-in-95 duration-200 modal-gradient"
+        className="w-full max-w-2xl rounded-xl overflow-visible shadow-2xl animate-in zoom-in-95 duration-200 modal-gradient"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}>
-          <h2 style={{ color: 'var(--w2w-pure-white)' }}>
+        <div className="flex items-center justify-between p-6 border-b border-subtle">
+          <h2 className="text-pure-white">
             {movie ? 'Edit Movie' : 'Add New Movie'}
           </h2>
           <button
@@ -64,11 +63,7 @@ export function AddEditModal({ isOpen, onClose, onSave, onDelete, movie }: AddEd
         </div>
 
         {/* Form */}
-        <form onSubmit={onSubmit} className="p-6 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar"
-          style={{
-            scrollbarWidth: 'thin',
-            scrollbarColor: 'rgba(255, 255, 255, 0.1) transparent'
-          }}>
+        <form onSubmit={onSubmit} className="p-6 space-y-4 max-h-[calc(100vh-200px)] overflow-y-auto custom-scrollbar">
           
           {/* Title and Original Title */}
           <div className="grid grid-cols-2 gap-4">
@@ -127,7 +122,7 @@ export function AddEditModal({ isOpen, onClose, onSave, onDelete, movie }: AddEd
               required
               value={formData.genre}
               onChange={(e) => updateField('genre', e.target.value)}
-              options={genres.map(g => ({ value: g, label: g }))}
+              options={GENRES.map(g => ({ value: g, label: g }))}
               error={errors.genre}
             />
             <FormSelect
@@ -182,8 +177,7 @@ export function AddEditModal({ isOpen, onClose, onSave, onDelete, movie }: AddEd
 
         {/* Footer */}
         <div
-          className="flex items-center justify-between gap-3 p-6 border-t"
-          style={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}
+          className="flex items-center justify-between gap-3 p-6 border-t border-subtle"
         >
           {/* Archive button - only for existing movies */}
           {movie && onDelete && (
@@ -200,40 +194,32 @@ export function AddEditModal({ isOpen, onClose, onSave, onDelete, movie }: AddEd
 
               {isConfirmOpen && (
                 <div
-                  className="absolute right-0 rounded-lg shadow-lg border"
-                  style={{
-                    background: 'var(--w2w-graphite)',
-                    borderColor: 'rgba(255, 255, 255, 0.1)',
-                    minWidth: '240px',
-                    zIndex: 50,
-                    bottom: 'calc(100% + 14px)',
-                  }}
+                  className="absolute right-0 rounded-lg shadow-lg border border-subtle bg-graphite z-50"
+                  style={{ bottom: 'calc(100% + 48px)', width: '100%' }}
+                  style={{ bottom: 'calc(100% + 48px)' }}
                 >
-                  <div className="p-4 space-y-3">
-                    <p className="text-sm" style={{ color: 'var(--w2w-pure-white)' }}>
+                  <div className="p-4">
+                    <p className="text-sm text-pure-white mb-2">
                       Archive this movie? It will be hidden from the list.
                     </p>
-                    <div
-                      className="flex justify-end gap-3"
-                      style={{ marginTop: '16px' }}
-                    >
+                    <div className="flex justify-end gap-2 mt-3">
                       <button
                         type="button"
-                        className="btn btn-secondary btn-compact"
+                        className="btn btn-secondary btn-xs px-3 py-1 text-xs"
                         onClick={() => setIsConfirmOpen(false)}
                       >
                         Cancel
                       </button>
                       <button
                         type="button"
-                        className="btn btn-danger btn-compact"
+                        className="btn btn-danger btn-xs px-3 py-1 text-xs"
                         onClick={() => {
                           onDelete(movie.id);
                           setIsConfirmOpen(false);
                           onClose();
                         }}
                       >
-                        Yes, archive
+                        Yes
                       </button>
                     </div>
                   </div>

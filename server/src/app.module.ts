@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule } from '@nestjs/config';
-import { MoviesModule } from './movies/movies.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+
 import { AuthModule } from './auth/auth.module';
-import { User } from './entities/user.entity';
 import { Movie } from './entities/movie.entity';
 import { StreamingSite } from './entities/streaming-site.entity';
+import { User } from './entities/user.entity';
+import { MoviesModule } from './movies/movies.module';
 
 @Module({
   imports: [

@@ -1,9 +1,10 @@
 import 'reflect-metadata';
 import dotenv from 'dotenv';
 import { DataSource } from 'typeorm';
-import { User } from '../entities/user.entity';
+
 import { Movie } from '../entities/movie.entity';
 import { StreamingSite } from '../entities/streaming-site.entity';
+import { User } from '../entities/user.entity';
 
 // Load environment variables BEFORE creating DataSource
 dotenv.config();

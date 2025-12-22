@@ -11,6 +11,7 @@ import { useMovieFilters } from '../hooks/useMovieFilters';
 import { apiClient } from '../api/client';
 import { toast } from 'sonner';
 import { convertDtoToMovie } from '../utils/movie.utils';
+import { FILTER_GENRES } from '../data/genres';
 
 export function MovieList() {
   const { user, logout } = useAuth();
@@ -32,7 +33,7 @@ export function MovieList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMovie, setEditingMovie] = useState<Movie | null>(null);
 
-  const genres = ['all', 'Action', 'Comedy', 'Drama', 'Horror', 'Sci-Fi', 'Thriller', 'Romance', 'Adventure'];
+  const genres = FILTER_GENRES;
 
   // Reset infinite scroll when filters/sort changes (but not search - that's client-side)
   useEffect(() => {
@@ -99,10 +100,7 @@ export function MovieList() {
   };
 
   return (
-    <div
-      className="min-h-screen"
-      style={{ backgroundColor: 'var(--w2w-deep-navy)' }}
-    >
+    <div className="min-h-screen bg-deep-navy">
       {/* Header */}
       <MovieListHeader
         searchQuery={searchQuery}

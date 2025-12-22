@@ -1,4 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, ManyToMany, CreateDateColumn } from 'typeorm';
+
 import { Movie } from './movie.entity';
 
 @Entity('streaming_sites')

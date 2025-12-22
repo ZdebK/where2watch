@@ -1,46 +1,149 @@
 
   # Where2Watch - Movie Streaming Tracker
 
-  Full-stack application for tracking movies and their streaming availability.
+  Full‑stack app to track movies and where they are available to stream.
 
   ## Project Structure
 
   ```
   /where2watch
-  ├── /client          # Frontend (React + Vite + TypeScript)
-  │   ├── /src         # React components, services, contexts
+  ├── client/            # Frontend (React + Vite + TypeScript)
+  │   ├── src/           # Components, hooks, services, contexts
   │   └── package.json
-  ├── /server          # Backend (Express + TypeORM + PostgreSQL)
-  │   ├── /src         # Entities, routes, services, config
+  ├── server/            # Backend (NestJS + TypeORM + PostgreSQL)
+  │   ├── src/           # Modules, controllers, entities, config
   │   └── package.json
-  └── /database        # SQL migration scripts
+  └── database/          # SQL migration/seed scripts (Upgrader)
   ```
 
-  ## Quick Start
+  ## Prerequisites
+  - Node.js 18+ (recommended: 20+)
+  - npm 9+
+  - PostgreSQL 14+ running locally
+  - Windows PowerShell (commands below use PowerShell)
 
-  **Backend:**
-  ```bash
-  cd server
-  npm install
-  npm run dev  # http://localhost:3001
+  ## Environment Setup
+  Create the following `.env` files.
+
+  - Server: `server/.env`
+  ```env
+  NODE_ENV=development
+  PORT=3001
+
+  DB_HOST=localhost
+  DB_PORT=5432
+  DB_NAME=where2watch
+  DB_USER=postgres
+  DB_PASSWORD=postgres
+  DB_SCHEMA=public
   ```
 
-  **Frontend:**
-  ```bash
-  cd client
+  - Client: `client/.env` (optional, defaults to the URL below)
+  ```env
+  VITE_API_URL=http://localhost:3001/api
+  ```
+
+  ## Install Dependencies
+  ```powershell
+  # Frontend
+  Push-Location "c:\projects\where2watch\where2watch\client"
   npm install
-  npm run dev  # http://localhost:5173
+  Pop-Location
+
+  # Backend
+  Push-Location "c:\projects\where2watch\where2watch\server"
+  npm install
+  Pop-Location
+  ```
+
+  ## Initialize Database
+  1) Ensure PostgreSQL is running and the user/credentials in `server/.env` exist.
+  2) Create the database if it doesn’t exist:
+  ```powershell
+  # Example using psql (adjust user/password as needed)
+  psql -U postgres -h localhost -c "CREATE DATABASE where2watch;"
+  ```
+  3) Apply schema + seed data using the Upgrader:
+  ```powershell
+  Push-Location "c:\projects\where2watch\where2watch\server"
+  npm run db:upgrade
+  Pop-Location
+  ```
+
+  ### Run Upgrader with Data
+  The upgrader executes SQL files in `database/upgrader` (tables + seeds) and records applied files in the `upgrade_history` table to avoid re-runs.
+
+  - Enable upgrades via env flag (required):
+  ```powershell
+  # One-time in current shell
+  $env:RUN_UPGRADES="true"
+
+  Push-Location "c:\projects\where2watch\where2watch\server"
+  npm run db:upgrade
+  Pop-Location
+  ```
+
+  - Or add to `server/.env` permanently:
+  ```env
+  RUN_UPGRADES=true
+  ```
+
+  Seed files included:
+  - `005_seed_streaming_sites.sql`
+  - `006_seed_popular_movies.sql`
+  - `007_associate_movies_with_streaming_sites.sql`
+
+  ## Run the App (Development)
+  - Start the backend (NestJS):
+  ```powershell
+  Push-Location "c:\projects\where2watch\where2watch\server"
+  npm run dev
+  Pop-Location
+  # Backend runs at http://localhost:3001
+  ```
+
+  - Start the frontend (Vite + React):
+  ```powershell
+  Push-Location "c:\projects\where2watch\where2watch\client"
+  npm run dev
+  Pop-Location
+  # Frontend opens at http://localhost:3000
+  ```
+
+  Access the app at http://localhost:3000. The client calls the API at http://localhost:3001/api.
+
+  ## Build (Production)
+  - Frontend:
+  ```powershell
+  Push-Location "c:\projects\where2watch\where2watch\client"
+  npm run build
+  Pop-Location
+  # Output in client/build
+  ```
+
+  - Backend:
+  ```powershell
+  Push-Location "c:\projects\where2watch\where2watch\server"
+  npm run build
+  node dist/index.js
+  Pop-Location
+  ```
+
+  ## Testing
+  - Frontend (Jest):
+  ```powershell
+  Push-Location "c:\projects\where2watch\where2watch\client"
+  npm test
+  # Or specific suites
+  npm run test:auth
+  Pop-Location
   ```
 
   ## Documentation
-
-  - [**Authentication System**](docs/auth-system.md) - JWT tokens, Auth Context, Security setup
-  - [**Database & Upgrader**](docs/database.md) - SQL migrations, schema management
-  - [**Testing**](docs/testing.md) - Unit tests, database connection tests
+  - [Authentication System](docs/auth-system.md)
+  - [Database & Upgrader](docs/database.md)
+  - [Testing](docs/testing.md)
 
   ## Attributions
-
-  This project uses:
-  - Components from [shadcn/ui](https://ui.shadcn.com/) - [MIT License](https://github.com/shadcn-ui/ui/blob/main/LICENSE.md)
-  - Images from [Unsplash](https://unsplash.com) - [Unsplash License](https://unsplash.com/license)
-  
+  - Components from [shadcn/ui](https://ui.shadcn.com/) — [MIT License](https://github.com/shadcn-ui/ui/blob/main/LICENSE.md)
+  - Images from [Unsplash](https://unsplash.com) — [Unsplash License](https://unsplash.com/license)

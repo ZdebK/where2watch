@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+
 import { Movie } from '../entities/movie.entity';
 import { StreamingSite } from '../entities/streaming-site.entity';
 
@@ -20,21 +21,7 @@ export interface CreateMovieDto {
   streamingSiteNames?: string[];
 }
 
-export interface UpdateMovieDto {
-  name?: string;
-  originalTitle?: string;
-  description?: string;
-  score?: number;
-  releaseDate?: Date;
-  durationMinutes?: number;
-  genre?: string;
-  director?: string;
-  language?: string;
-  country?: string;
-  ageRating?: string;
-  posterUrl?: string;
-  streamingSiteNames?: string[];
-}
+export type UpdateMovieDto = Partial<CreateMovieDto>;
 
 @Injectable()
 export class MoviesService {
@@ -44,6 +31,7 @@ export class MoviesService {
     @InjectRepository(StreamingSite)
     private streamingSiteRepository: Repository<StreamingSite>,
   ) {}
+
 
   async getAllMovies(limit = 10, offset = 0): Promise<Movie[]> {
     const take = Math.min(Math.max(limit, 1), 100);

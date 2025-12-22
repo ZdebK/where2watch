@@ -7,6 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
 import { StreamingSite } from './streaming-site.entity';
 
 @Entity('movies')

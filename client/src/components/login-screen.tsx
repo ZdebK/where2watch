@@ -11,13 +11,13 @@ export function LoginScreen() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (isLoading) return; // guard against double submit
     setError('');
     try {
-      await login(email, password);
+      await login(email.trim(), password);
       toast.success('Zalogowano pomyślnie');
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Nie udało się zalogować. Spróbuj ponownie.';
-      // Dodajemy przyjaźniejszy komunikat z podpowiedzią
       setError(`${message} Jeśli problem się powtarza, sprawdź połączenie lub spróbuj ponownie za chwilę.`);
       toast.error(message);
     }
@@ -32,14 +32,13 @@ export function LoginScreen() {
     >
       <div className="w-full max-w-md">
         <div className="text-center mb-12">
-          <Logo className="text-3xl justify-center mb-2" />
+          <Logo className="justify-center mb-3" maxHeight={72} />
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
             <div
-              className="rounded-lg px-4 py-3 text-sm"
-              style={{ backgroundColor: 'rgba(255, 138, 0, 0.15)', color: '#ffba7a' }}
+              className="rounded-lg px-4 py-3 text-sm bg-orange-soft text-orange-soft"
               role="alert"
             >
               {error}
@@ -57,6 +56,7 @@ export function LoginScreen() {
               autoComplete="email"
               required
               className="formField w-full"
+              disabled={isLoading}
             />
           </div>
 
@@ -71,6 +71,7 @@ export function LoginScreen() {
               autoComplete="current-password"
               required
               className="formField w-full"
+              disabled={isLoading}
             />
           </div>
 
@@ -78,8 +79,9 @@ export function LoginScreen() {
             type="submit"
             className="btn btn-primary w-full"
             disabled={isLoading}
+            aria-busy={isLoading}
           >
-            {isLoading ? 'Logging in...' : 'Login'}
+            {isLoading ? 'Logging in…' : 'Login'}
           </button>
         </form>
       </div>

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Trash2 } from 'lucide-react';
 import { ImageWithFallback } from './image-with-fallback';
 
@@ -7,7 +8,33 @@ interface PosterUploadProps {
   error?: string;
 }
 
+const IMAGE_EXTENSIONS = /(\.jpg|\.jpeg|\.png|\.webp|\.avif|\.gif)$/i;
+
 export function PosterUpload({ value, onChange, error }: PosterUploadProps) {
+  const [localError, setLocalError] = useState('');
+
+  const validateUrl = (url: string) => {
+    if (!url) {
+      setLocalError('');
+      return;
+    }
+    try {
+      const parsed = new URL(url);
+      if (!['http:', 'https:'].includes(parsed.protocol)) {
+        setLocalError('URL must start with http or https');
+        return;
+      }
+      // Basic hint: ensure it looks like an image URL
+      const path = parsed.pathname.split('?')[0] || '';
+      if (!IMAGE_EXTENSIONS.test(path)) {
+        setLocalError('URL should point to an image (jpg, png, webp, avif, gif)');
+        return;
+      }
+      setLocalError('');
+    } catch {
+      setLocalError('Invalid URL');
+    }
+  };
   return (
     <div>
       <label className="formLabel required">
@@ -17,9 +44,14 @@ export function PosterUpload({ value, onChange, error }: PosterUploadProps) {
         <input
           type="url"
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => {
+            const next = e.target.value;
+            setLocalError('');
+            onChange(next);
+          }}
+          onBlur={(e) => validateUrl(e.target.value.trim())}
           placeholder="https://.../poster.jpg"
-          className={`formField ${error ? 'error' : ''}`}
+          className={`formField ${(error || localError) ? 'error' : ''}`}
         />
 
         {value && (
@@ -41,9 +73,9 @@ export function PosterUpload({ value, onChange, error }: PosterUploadProps) {
         )}
       </div>
 
-      {error && (
+      {(error || localError) && (
         <span className="formError">
-          {error}
+          {error || localError}
         </span>
       )}
     </div>

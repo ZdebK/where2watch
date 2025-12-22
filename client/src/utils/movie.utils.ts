@@ -2,6 +2,8 @@ import { Movie } from '../components/movie-card';
 import { MovieDTO } from '../api/client';
 
 export function convertDtoToMovie(dto: MovieDTO): Movie {
+  const streamingSites = dto.streamingSites?.map((site) => site.name) || [];
+
   return {
     id: dto.id,
     title: dto.name,
@@ -11,7 +13,7 @@ export function convertDtoToMovie(dto: MovieDTO): Movie {
     rating: dto.ageRating || 'Not Rated',
     description: dto.description || '',
     posterUrl: dto.posterUrl || '',
-    streamingSites: dto.streamingSites?.map(site => site.name) || [],
+    streamingSites,
     score: dto.score,
     releaseDate: dto.releaseDate ? new Date(dto.releaseDate) : undefined,
     durationMinutes: dto.durationMinutes,
