@@ -195,7 +195,6 @@ export function AddEditModal({ isOpen, onClose, onSave, onDelete, movie }: AddEd
               {isConfirmOpen && (
                 <div
                   className="absolute right-0 rounded-lg shadow-lg border border-subtle bg-graphite z-50"
-                  style={{ bottom: 'calc(100% + 48px)', width: '100%' }}
                   style={{ bottom: 'calc(100% + 48px)' }}
                 >
                   <div className="p-4">
