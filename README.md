@@ -1,5 +1,4 @@
-
-  # Where2Watch - Movie Streaming Tracker
+# Where2Watch - Movie Streaming Tracker
 
   Full‑stack app to track movies and where they are available to stream.
 
@@ -7,7 +6,7 @@
 
   ```
   /where2watch
-  ├── client/            # Frontend (React + Vite + TypeScript)
+  ├── client/            # Frontend (React + Vite + TypeScript + Tailwind)
   │   ├── src/           # Components, hooks, services, contexts
   │   └── package.json
   ├── server/            # Backend (NestJS + TypeORM + PostgreSQL)
@@ -36,6 +35,7 @@
   DB_USER=postgres
   DB_PASSWORD=postgres
   DB_SCHEMA=public
+  RUN_UPGRADES=true  # Enables automatic database migrations and seeding
   ```
 
   - Client: `client/.env` (optional, defaults to the URL below)
@@ -112,6 +112,15 @@
 
   Access the app at http://localhost:3000. The client calls the API at http://localhost:3001/api.
 
+## Example Users
+
+You can use the following sample user to log in:
+
+- **Username:** alice
+- **Email:** alice@example.com
+- **Password:** password123
+
+
   ## Build (Production)
   - Frontend:
   ```powershell
@@ -159,3 +168,54 @@ See [docs/testing.md](docs/testing.md) for details and troubleshooting.
   ## Attributions
   - Components from [shadcn/ui](https://ui.shadcn.com/) — [MIT License](https://github.com/shadcn-ui/ui/blob/main/LICENSE.md)
   - Images from [Unsplash](https://unsplash.com) — [Unsplash License](https://unsplash.com/license)
+
+## Running with Docker/Docker Compose
+
+You can run the entire application (frontend, backend, database) using Docker and docker-compose.
+
+### 1. Requirements
+- Docker and Docker Compose installed
+
+### 2. Files
+- `Dockerfile` in the `server/` folder (backend)
+- `Dockerfile` in the `client/` folder (frontend)
+- `docker-compose.yml` in the project root
+
+### 3. How to run
+In the project root directory, run:
+
+```bash
+docker-compose up --build
+```
+
+- Frontend will be available at `http://localhost:3000`
+- Backend (NestJS) at `http://localhost:3001`
+- PostgreSQL database at `localhost:5432`
+
+### 4. Automatic seeding and migrations
+The backend automatically runs the upgrader script (`npm run db:upgrade`), which:
+- Creates tables and database structure
+- Adds sample (seed) data
+- Registers applied migrations in the `upgrade_history` table
+
+You do not need to run migrations or seeding manually – everything happens automatically when the backend container starts.
+
+### 5. Stopping the application
+To stop all containers:
+```bash
+docker-compose down
+```
+
+---
+
+> **Note:** The backend automatically runs the upgrader script on container startup if the following environment flag is set in `server/.env` or via environment variables:
+>
+> ```env
+> RUN_UPGRADES=true
+> ```
+>
+> This ensures migrations and seeding are performed automatically. The flag is already set in the `.env` file and passed by `docker-compose.yml`.
+
+## Copyright & Usage
+
+This project is protected by copyright. You may only run and test the application for demonstration or evaluation purposes. Any other use, distribution, or modification without the author's permission is strictly prohibited.
