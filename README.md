@@ -2,6 +2,27 @@
 
   Full‑stack app to track movies and where they are available to stream.
 
+## Live Demo
+
+You can watch a demo of the application below:
+
+<video src="demo_wheretowatch.mp4" controls width="700">
+  Your browser does not support the video tag.
+</video>
+
+
+## Screenshots
+
+### Login Screen
+![Login Screen](docs/screenshot-login.png)
+
+### Movie Grid
+![Movie Grid](docs/screenshot-grid.png)
+
+### Edit Movie Modal
+![Edit Movie Modal](docs/scrreenshot-edit.png)
+
+
   ## Project Structure
 
   ```
