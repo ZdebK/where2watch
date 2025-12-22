@@ -15,7 +15,7 @@ export function StreamingSitesProvider({ children, initialSites, isLoading = fal
   // If initialSites is provided (test/mock), use it instead of API
   const streamingSites = initialSites ?? [];
   const error = null;
-  const refetch = async () => {};
+  const refetch = async () => { };
 
   if (initialSites) {
     return (
