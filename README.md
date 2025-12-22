@@ -165,10 +165,6 @@ See [docs/testing.md](docs/testing.md) for details and troubleshooting.
 - [Database & Upgrader](docs/database.md)
 - [Testing](docs/testing.md)
 
-  ## Attributions
-  - Components from [shadcn/ui](https://ui.shadcn.com/) — [MIT License](https://github.com/shadcn-ui/ui/blob/main/LICENSE.md)
-  - Images from [Unsplash](https://unsplash.com) — [Unsplash License](https://unsplash.com/license)
-
 ## Running with Docker/Docker Compose
 
 You can run the entire application (frontend, backend, database) using Docker and docker-compose.
@@ -215,6 +211,10 @@ docker-compose down
 > ```
 >
 > This ensures migrations and seeding are performed automatically. The flag is already set in the `.env` file and passed by `docker-compose.yml`.
+
+## Attributions
+- Components from [shadcn/ui](https://ui.shadcn.com/) — [MIT License](https://github.com/shadcn-ui/ui/blob/main/LICENSE.md)
+- Images from [Unsplash](https://unsplash.com) — [Unsplash License](https://unsplash.com/license)
 
 ## Copyright & Usage
 
