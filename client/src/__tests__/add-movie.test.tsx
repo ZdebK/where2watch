@@ -1,7 +1,14 @@
 import '@testing-library/jest-dom';
 import { render, fireEvent, screen } from '@testing-library/react';
 import { AddEditModal } from '../components/add-edit-modal';
-import { StreamingSitesProvider } from '../contexts/streaming-sites.context';
+import { StreamingSitesContext } from '../contexts/streaming-sites.context';
+
+// Create a mock provider for testing
+const StreamingSitesProvider = ({ children, initialSites, isLoading }: any) => (
+  <StreamingSitesContext.Provider value={{ streamingSites: initialSites, isLoading, error: null, refetch: async () => { } }}>
+    {children}
+  </StreamingSitesContext.Provider>
+);
 
 function renderWithProviders(ui: React.ReactElement) {
   // StreamingSitesPicker expects array of platform names (string[])

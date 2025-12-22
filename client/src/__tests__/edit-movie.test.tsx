@@ -7,7 +7,7 @@ import { StreamingSitesProvider } from '../contexts/streaming-sites.context';
 function renderWithProviders(ui: React.ReactElement) {
   const mockPlatforms = ['Netflix', 'Max', 'Disney+'];
   return render(
-    <StreamingSitesProvider initialSites={mockPlatforms} isLoading={false}>
+    <StreamingSitesProvider initialSites={mockPlatforms}>
       {ui}
     </StreamingSitesProvider>
   );

@@ -48,7 +48,7 @@ describe('Error Handling', () => {
     const onSave = jest.fn(() => Promise.reject({ status: 400 }));
     render(
       <AuthProvider>
-        <StreamingSitesProvider initialSites={mockPlatforms} isLoading={false}>
+        <StreamingSitesProvider initialSites={mockPlatforms}>
           <AddEditModal isOpen={true} onSave={onSave} onClose={() => { }} />
         </StreamingSitesProvider>
       </AuthProvider>
