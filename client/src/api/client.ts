@@ -1,3 +1,4 @@
+import { getApiUrl } from '../utils/getApiUrl';
 import type {
   MovieDTO,
   StreamingSiteDTO,
@@ -12,7 +13,7 @@ export type {
   UpdateMovieRequest,
 };
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+const API_BASE_URL = getApiUrl();
 
 class ApiClient {
   private baseUrl: string;
@@ -23,7 +24,7 @@ class ApiClient {
 
   private async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
-    
+
     try {
       const response = await fetch(url, {
         ...options,

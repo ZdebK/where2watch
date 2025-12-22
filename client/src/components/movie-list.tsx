@@ -17,6 +17,7 @@ export function MovieList() {
   const { user, logout } = useAuth();
   const { streamingSites: platforms } = useStreamingSites();
   const { movies, isLoadingMore, hasMore, loadMoreRef, loadMore, updateMovie, addMovie, removeMovie, refetch } = useMovies();
+  const [error, setError] = useState<string | null>(null);
   const {
     filteredMovies,
     searchQuery,
@@ -37,7 +38,15 @@ export function MovieList() {
 
   // Reset infinite scroll when filters/sort changes (but not search - that's client-side)
   useEffect(() => {
-    refetch();
+    const fetchWithError = async () => {
+      try {
+        await refetch();
+        setError(null);
+      } catch (err: any) {
+        setError(err?.message || 'Failed to load movies');
+      }
+    };
+    fetchWithError();
   }, [activeGenre, activeYearRange, sortBy, activePlatforms.length]);
 
   const handleSaveMovie = async (movieData: Omit<Movie, 'id'> & { id?: string }) => {
@@ -101,6 +110,11 @@ export function MovieList() {
 
   return (
     <div className="min-h-screen bg-deep-navy">
+      {error && (
+        <div role="alert" className="bg-red-900 text-white p-4 text-center">
+          {error}
+        </div>
+      )}
       {/* Header */}
       <MovieListHeader
         searchQuery={searchQuery}

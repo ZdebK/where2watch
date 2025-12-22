@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001/api';
+import { getApiUrl } from "../utils/getApiUrl";
+
 const TOKEN_KEY = 'auth_token';
 
 interface LoginCredentials {
@@ -53,7 +54,7 @@ class AuthService {
    */
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
+      const response = await fetch(`${getApiUrl()}/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -63,7 +64,7 @@ class AuthService {
 
       if (!response.ok) {
         let errorMessage = 'Unable to login. Please try again.';
-        
+
         try {
           const errorData = await response.json();
           if (errorData.message) {
@@ -83,7 +84,7 @@ class AuthService {
             errorMessage = 'Server error. Please try again later.';
           }
         }
-        
+
         throw new Error(errorMessage);
       }
 

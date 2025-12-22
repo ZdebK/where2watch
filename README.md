@@ -129,20 +129,32 @@
   Pop-Location
   ```
 
-  ## Testing
-  - Frontend (Jest):
-  ```powershell
-  Push-Location "c:\projects\where2watch\where2watch\client"
-  npm test
-  # Or specific suites
-  npm run test:auth
-  Pop-Location
-  ```
 
-  ## Documentation
-  - [Authentication System](docs/auth-system.md)
-  - [Database & Upgrader](docs/database.md)
-  - [Testing](docs/testing.md)
+## Testing
+
+All frontend tests pass:
+
+Test Suites: 5 passed, 5 total
+Tests: 15 passed, 15 total
+
+To run all tests:
+```powershell
+Push-Location "c:\projects\where2watch\where2watch\client"
+npm test
+Pop-Location
+```
+
+To run a specific test file:
+```powershell
+npm test -- --testPathPattern=movie-list
+```
+
+See [docs/testing.md](docs/testing.md) for details and troubleshooting.
+
+## Documentation
+- [Authentication System](docs/auth-system.md)
+- [Database & Upgrader](docs/database.md)
+- [Testing](docs/testing.md)
 
   ## Attributions
   - Components from [shadcn/ui](https://ui.shadcn.com/) — [MIT License](https://github.com/shadcn-ui/ui/blob/main/LICENSE.md)

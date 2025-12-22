@@ -11,7 +11,20 @@ interface StreamingSitesContextType {
 
 const StreamingSitesContext = createContext<StreamingSitesContextType | undefined>(undefined);
 
-export function StreamingSitesProvider({ children }: { children: ReactNode }) {
+export function StreamingSitesProvider({ children, initialSites, isLoading = false }: { children: ReactNode; initialSites?: string[]; isLoading?: boolean }) {
+  // If initialSites is provided (test/mock), use it instead of API
+  const streamingSites = initialSites ?? [];
+  const error = null;
+  const refetch = async () => {};
+
+  if (initialSites) {
+    return (
+      <StreamingSitesContext.Provider value={{ streamingSites, isLoading, error, refetch }}>
+        {children}
+      </StreamingSitesContext.Provider>
+    );
+  }
+
   const fetchStreamingSites = useCallback(() => apiClient.getAllStreamingSites(), []);
   const handleError = useCallback((err: Error) => {
     // Log full error for diagnostics
@@ -19,7 +32,7 @@ export function StreamingSitesProvider({ children }: { children: ReactNode }) {
   }, []);
   const hasFetched = useRef(false);
 
-  const { data: streamingSites, isLoading, error, execute } = useApiCall(
+  const { data: apiSites, isLoading: apiLoading, error: apiError, execute } = useApiCall(
     fetchStreamingSites,
     {
       errorMessage: 'Failed to load streaming sites',
@@ -34,9 +47,8 @@ export function StreamingSitesProvider({ children }: { children: ReactNode }) {
     execute();
   }, [execute]);
 
-  const platformNames = streamingSites?.map((site) => site.name) || [];
-
-  const refetch = async () => {
+  const platformNames = apiSites?.map((site) => site.name) || [];
+  const refetchApi = async () => {
     await execute();
   };
 
@@ -44,9 +56,9 @@ export function StreamingSitesProvider({ children }: { children: ReactNode }) {
     <StreamingSitesContext.Provider
       value={{
         streamingSites: platformNames,
-        isLoading,
-        error,
-        refetch,
+        isLoading: apiLoading,
+        error: apiError,
+        refetch: refetchApi,
       }}
     >
       {children}

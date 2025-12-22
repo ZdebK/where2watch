@@ -1,8 +1,10 @@
+
 # Authentication System
 
-Bezpieczny system uwierzytelniania z JWT tokenami i state management.
+Secure authentication system with JWT tokens and state management.
 
-## Architektura
+
+## Architecture
 
 ```
 AuthService (auth.service.ts)
@@ -12,36 +14,43 @@ AuthContext (auth.context.tsx)
 Components (LoginScreen, MovieList, ProtectedRoute)
 ```
 
-## Komponenty
+
+## Components
+
 
 ### 1. AuthService (`src/services/auth.service.ts`)
-Obsługuje komunikację z backendem:
-- `login(credentials)` - Logowanie użytkownika
-- `logout()` - Wylogowanie
-- `getToken()` - Pobierz JWT token
-- `isAuthenticated()` - Sprawdź status autentykacji
-- `getAuthHeader()` - Nagłówek do API callsów
+Handles backend communication:
+- `login(credentials)` - User login
+- `logout()` - Logout
+- `getToken()` - Get JWT token
+- `isAuthenticated()` - Check authentication status
+- `getAuthHeader()` - Header for API calls
 
-**Przechowywanie tokenu:**
+
+**Token storage:**
 ```typescript
-// JWT token jest przechowywany w localStorage
-localStorage.setItem('access_token', token);
+// JWT token is stored in localStorage
+localStorage.setItem('auth_token', token);
 ```
 
+
 ### 2. AuthContext (`src/contexts/auth.context.tsx`)
-Global state dla autentykacji:
+Global authentication state:
 
 ```typescript
+
 interface AuthContextType {
-  user: User | null;              // Aktualny użytkownik
-  isAuthenticated: boolean;        // Status logowania
-  isLoading: boolean;              // Ładowanie
-  login(email, password): Promise; // Logowanie
-  logout(): void;                  // Wylogowanie
+  user: User | null;              // Current user
+  isAuthenticated: boolean;       // Login status
+  isLoading: boolean;             // Loading
+  login(email, password): Promise;// Login
+  logout(): void;                 // Logout
 }
 ```
 
-### 3. Komponenty
+
+### 3. Components
+
 
 #### LoginScreen
 ```typescript
@@ -52,10 +61,11 @@ export function LoginScreen() {
   
   const handleLogin = async (email, password) => {
     await login(email, password);
-    // Automatyczne przekierowanie po login
+    // Automatic redirect after login
   };
 }
 ```
+
 
 #### MovieList
 ```typescript
@@ -66,12 +76,13 @@ export function MovieList() {
   
   return (
     <>
-      <p>Zalogowany jako: {user?.email}</p>
-      <button onClick={logout}>Wyloguj</button>
+      <p>Logged as: {user?.email}</p>
+      <button onClick={logout}>Logout</button>
     </>
   );
 }
 ```
+
 
 #### ProtectedRoute
 ```typescript
@@ -80,29 +91,31 @@ export function MovieList() {
 </ProtectedRoute>
 ```
 
+
 ## Security Features
 
 ✅ **JWT Token Storage**
-- Token przechowywany w `localStorage`
-- Wysyłany w `Authorization: Bearer <token>` header
+- Token is stored in `localStorage` as `auth_token`
+- Sent in `Authorization: Bearer <token>` header
 
 ✅ **Token Expiration**
-- Access token: 15 minut
-- Refresh token: 7 dni (backend)
+- Access token: 15 minutes
+- Refresh token: 7 days (backend)
 
 ✅ **Auto-logout**
-- Przy wygaśnięciu tokenu
-- Przekierowanie na login
+- On token expiration
+- Redirect to login
 
 ✅ **Protected Routes**
-- `ProtectedRoute` komponenty
-- Sprawdzenie `isAuthenticated`
+- `ProtectedRoute` components
+- Checks `isAuthenticated`
 
 ✅ **Secure Headers**
 - `Content-Type: application/json`
 - `Authorization: Bearer <token>`
 
-## Użycie w Komponencie
+
+## Usage in Component
 
 ```typescript
 import { useAuth } from '@/contexts/auth.context';
@@ -121,39 +134,42 @@ function MyComponent() {
 }
 ```
 
+
 ## API Integration
 
-Backend powinien zwracać:
+Backend should return:
 
 ```json
 POST /api/auth/login
 {
-  "access_token": "eyJhbGc...",
+  "token": "eyJhbGc...",
   "user": {
     "id": "uuid",
     "email": "user@example.com",
-    "username": "username"
+    "name": "username"
   }
 }
 ```
 
-## Flow logowania
+
+## Login Flow
 
 ```
 1. LoginScreen.tsx
-   ↓
+  ↓
 2. useAuth().login(email, password)
-   ↓
+  ↓
 3. AuthService.login() - POST /api/auth/login
-   ↓
-4. localStorage.setItem('access_token', token)
-   ↓
-5. AuthContext.setUser() - Zaktualizuj state
-   ↓
-6. App.tsx renderuje MovieList
+  ↓
+4. localStorage.setItem('auth_token', token)
+  ↓
+5. AuthContext.setUser() - update state
+  ↓
+6. App.tsx renders MovieList
 ```
 
-## Rozszerzenia
+
+## Extensions
 
 TODO:
 - [ ] Refresh token handling

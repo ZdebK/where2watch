@@ -20,12 +20,14 @@ interface FormSelectProps extends Omit<InputHTMLAttributes<HTMLSelectElement>, '
 }
 
 export function FormInput({ label, error, required, ...props }: FormInputProps) {
+  const inputId = props.id || label.replace(/\s+/g, '-').toLowerCase();
   return (
     <div className="formGroup">
-      <label className={`formLabel ${required ? 'required' : ''}`}>
+      <label className={`formLabel ${required ? 'required' : ''}`} htmlFor={inputId}>
         {label}
       </label>
       <input
+        id={inputId}
         {...props}
         className={`formField formInput ${error ? 'error' : ''}`}
       />
@@ -35,12 +37,14 @@ export function FormInput({ label, error, required, ...props }: FormInputProps) 
 }
 
 export function FormTextarea({ label, error, required, ...props }: FormTextareaProps) {
+  const textareaId = props.id || label.replace(/\s+/g, '-').toLowerCase();
   return (
     <div className="formGroup">
-      <label className={`formLabel ${required ? 'required' : ''}`}>
+      <label className={`formLabel ${required ? 'required' : ''}`} htmlFor={textareaId}>
         {label}
       </label>
       <textarea
+        id={textareaId}
         {...props}
         className={`formField formTextarea ${error ? 'error' : ''}`}
       />
@@ -50,12 +54,14 @@ export function FormTextarea({ label, error, required, ...props }: FormTextareaP
 }
 
 export function FormSelect({ label, error, required, options, ...props }: FormSelectProps) {
+  const selectId = props.id || label.replace(/\s+/g, '-').toLowerCase();
   return (
     <div className="formGroup">
-      <label className={`formLabel ${required ? 'required' : ''}`}>
+      <label className={`formLabel ${required ? 'required' : ''}`} htmlFor={selectId}>
         {label}
       </label>
       <select
+        id={selectId}
         {...props}
         className={`formField formSelect ${error ? 'error' : ''}`}
       >

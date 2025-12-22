@@ -15,10 +15,10 @@ export function LoginScreen() {
     setError('');
     try {
       await login(email.trim(), password);
-      toast.success('Zalogowano pomyślnie');
+      toast.success('Login successful');
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Nie udało się zalogować. Spróbuj ponownie.';
-      setError(`${message} Jeśli problem się powtarza, sprawdź połączenie lub spróbuj ponownie za chwilę.`);
+      const message = err instanceof Error ? err.message : 'Login failed. Try again later.';
+      setError(`${message} If the problem persists, check your connection or try again in a moment.`);
       toast.error(message);
     }
   };

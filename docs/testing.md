@@ -1,182 +1,130 @@
-# Unit Tests
+# Aktualny stan testów (22.12.2025)
 
-Testing suite dla Where2Watch - sprawdzanie połączenia do bazy danych i usług.
+Wszystkie testy frontendowe przechodzą poprawnie:
 
-## Setup
+Test Suites: 5 passed, 5 total
+Tests: 15 passed, 15 total
 
-Testy używają **Jest** + **ts-jest** do testowania TypeScript kodu.
+## Przykład testu (MovieList)
+
+```typescript
+import { render, screen } from '@testing-library/react';
+import { MovieList } from '../components/movie-list';
+
+function mockFetchJson(data: any) {
+  return jest.fn(() => Promise.resolve({
+    ok: true,
+    status: 200,
+    headers: { get: () => '123' },
+    json: () => Promise.resolve(data),
+    text: () => Promise.resolve(JSON.stringify(data)),
+  }));
+}
+
+global.fetch = mockFetchJson([...]);
+render(<MovieList />);
+expect(await screen.findByText('Matrix')).toBeInTheDocument();
+```
+
+## Best practices
+- Mockuj fetch w każdym teście, jeśli komponent korzysta z API
+- Używaj providerów (AuthProvider, StreamingSitesProvider) jeśli komponent ich wymaga
+- Resetuj mocki w beforeEach
+- Sprawdzaj rzeczywiste komunikaty błędów w asercjach
+
+## Troubleshooting
+- Jeśli test nie przechodzi, sprawdź czy dane testowe mają odpowiedni kształt
+- Jeśli pojawia się błąd z fetch, zamockuj go jak wyżej
+
+## Raport
+Test Suites: 5 passed, 5 total
+Tests: 15 passed, 15 total
+
+
+# Testing (Frontend)
+
+Testy frontendowe korzystają z **Jest** oraz **React Testing Library**.
 
 ## Struktura testów
 
 ```
-src/
-└── __tests__/
-    ├── database.test.ts        # Testy połączenia z PostgreSQL
-    ├── auth.service.test.ts    # Testy authentication service
+client/src/__tests__/
+  ├── movie-list.test.tsx      # Testy listy filmów
+  ├── auth.service.test.ts     # Testy serwisu autoryzacji
+  ...
 ```
 
 ## Uruchamianie testów
 
-```bash
-# Wszystkie testy
+```powershell
+Push-Location "c:\projects\where2watch\where2watch\client"
 npm test
-
-# Watch mode (automatycznie re-run przy zmianach)
-npm run test:watch
-
-# Tylko testy bazy danych
-npm run test:db
-
-# Tylko testy auth service
-npm run test:auth
-
-# Coverage report
-npm run test:coverage
+Pop-Location
 ```
 
-## Testy bazy danych (`database.test.ts`)
-
-Sprawdzają:
-- ✅ Połączenie z PostgreSQL
-- ✅ Czy można wykonywać queries
-- ✅ Czy istnieją wszystkie tabele:
-  - `Users`
-  - `Movies`
-  - `StreamingSites`
-  - `MovieStreamingSites`
-- ✅ Czy kolumny w tabelach są poprawne
-
-### Wymagania
-
-Muszą być spełnione warunki:
-1. PostgreSQL musi być uruchomiony
-2. `.env` musi mieć poprawne parametry `DB_*`
-3. Upgrady musiały być uruchomione (`npm run db:upgrade`)
-
-### Przykład sukcesu
-
-```
-PASS  src/__tests__/database.test.ts (5.234s)
-  Database Connection
-    ✓ should connect to database successfully (45ms)
-    ✓ should be able to execute queries (32ms)
-    ✓ should have Users table (28ms)
-    ✓ should have Movies table (25ms)
-    ✓ should have StreamingSites table (24ms)
-    ✓ should have MovieStreamingSites junction table (22ms)
-    ✓ should have Users table with correct columns (19ms)
-
-Test Suites: 1 passed, 1 total
-Tests:       7 passed, 7 total
+Możesz uruchomić wybrane testy:
+```powershell
+npm test -- --testPathPattern=movie-list
 ```
 
-## Testy Auth Service (`auth.service.test.ts`)
+## Mockowanie fetch w testach
 
-Sprawdzają:
-- ✅ Token management (set, get, clear)
-- ✅ Authentication status
-- ✅ Authorization headers
-- ✅ localStorage operations
-
-### Przykład sukcesu
-
-```
-PASS  src/__tests__/auth.service.test.ts
-  AuthService
-    ✓ should not have token on initialization (2ms)
-    ✓ should set and get token (1ms)
-    ✓ should clear token (2ms)
-    ✓ should correctly report authentication status (1ms)
-    ✓ should provide correct auth headers without token (1ms)
-    ✓ should provide correct auth headers with token (1ms)
-
-Test Suites: 1 passed, 1 total
-Tests:       6 passed, 6 total
-```
-
-## Dodawanie nowych testów
-
-1. Stwórz plik `src/__tests__/my-feature.test.ts`
-2. Zaimportuj funkcje do testowania
-3. Użyj `describe()` i `it()` do organizacji testów
-4. Uruchom `npm test`
-
-### Szablon testu
+W testach komponentów korzystających z API (np. MovieList) należy zamockować `global.fetch`:
 
 ```typescript
-/**
- * My Feature Test
- */
+function mockFetchJson(data: any) {
+  return jest.fn(() => Promise.resolve({
+    ok: true,
+    status: 200,
+    headers: { get: () => '123' },
+    json: () => Promise.resolve(data),
+    text: () => Promise.resolve(JSON.stringify(data)),
+  }));
+}
+global.fetch = mockFetchJson([...]);
+```
 
-import { myFunction } from '../services/my.service';
+## Przykład testu komponentu
 
-describe('MyFeature', () => {
-  beforeEach(() => {
-    // Przygotowanie przed każdym testem
-  });
+```typescript
+import { render, screen } from '@testing-library/react';
+import { MovieList } from '../components/movie-list';
 
-  afterEach(() => {
-    // Czyszczenie po każdym teście
-  });
-
-  it('should do something', () => {
-    const result = myFunction();
-    expect(result).toBe(true);
-  });
+it('fetches and displays movies', async () => {
+  global.fetch = mockFetchJson([{ name: 'Matrix', ... }]);
+  render(<MovieList />);
+  expect(await screen.findByText('Matrix')).toBeInTheDocument();
 });
 ```
 
-## Debugging testów
+## Przykład raportu
 
-```bash
-# Run z debuggingiem
-node --inspect-brk node_modules/.bin/jest --runInBand
-
-# Lub w VS Code: F5 z configuration do jest
 ```
+PASS  src/__tests__/movie-list.test.tsx
+  Movie List
+    √ fetches and displays movies after login (168 ms)
+    √ handles empty movie list (43 ms)
 
-## Best Practices
-
-✅ **Test organization**
-- Jeden test file = jedna klasa/service
-- Logiczne groupowanie w `describe()`
-- Descriptive test names
-
-✅ **Test isolation**
-- `beforeEach()` - przygotowanie
-- `afterEach()` - czyszczenie
-- Brak zależności między testami
-
-✅ **Assertions**
-- Jeden `expect` na test (jeśli możliwe)
-- Jasne komunikaty o błędach
-- Test sprawdza jedno zachowanie
-
-✅ **Async testing**
-```typescript
-it('should handle async', async () => {
-  const result = await asyncFunction();
-  expect(result).toBeDefined();
-});
+Test Suites: 1 passed, 1 total
+Tests:       2 passed, 2 total
+Snapshots:   0 total
 ```
 
 ## Troubleshooting
 
-### "Cannot find module"
-```
-rm -rf node_modules
-npm install
-```
+- Jeśli pojawia się błąd `Response is not defined`, użyj mocka jak powyżej (nie używaj klasy Response).
+- Jeśli testy nie widzą tekstu, sprawdź czy dane testowe mają odpowiednie pola (`name`, `title`).
+- Jeśli testy nie przechodzą przez brak kontekstu, owiń komponent w odpowiednie providery (np. `AuthProvider`, `StreamingSitesProvider`).
 
-### "Database connection failed"
-- Sprawdź czy PostgreSQL działa
-- Sprawdź `.env` zmienne
-- Uruchom `npm run db:upgrade`
+## Best Practices
 
-### "Test timeout"
-Zwiększ timeout:
-```typescript
-it('slow test', async () => {
-  // test
-}, 10000); // 10 second timeout
-```
+- Każdy test powinien być niezależny (`beforeEach`, `afterEach` do czyszczenia mocków i localStorage).
+- Testuj tylko jedno zachowanie na test.
+- Używaj descriptive test names.
+
+## Dodawanie nowych testów
+
+1. Stwórz plik w `client/src/__tests__`
+2. Zaimportuj testowany komponent/funkcję
+3. Zamockuj zależności (fetch, context)
+4. Uruchom `npm test`

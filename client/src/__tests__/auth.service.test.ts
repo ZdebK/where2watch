@@ -92,21 +92,21 @@ describe('AuthService', () => {
       json: async () => ({ message: 'Database connection error' }),
     } as any;
 
-    jest.spyOn(global, 'fetch').mockResolvedValue(mockResponse);
+    global.fetch = jest.fn().mockResolvedValue(mockResponse);
 
     await expect(
       authService.login({ email: 'user@test.com', password: 'password123' })
-    ).rejects.toThrow('Server unavailable');
+    ).rejects.toThrow('Server is currently unavailable. Please try again later.');
   });
 
   /**
    * Test: Surface server unavailable message on network failures
    */
   it('should surface server unavailable message on network failure', async () => {
-    jest.spyOn(global, 'fetch').mockRejectedValue(new TypeError('fetch failed'));
+    global.fetch = jest.fn().mockRejectedValue(new TypeError('fetch failed'));
 
     await expect(
       authService.login({ email: 'user@test.com', password: 'password123' })
-    ).rejects.toThrow('Server unavailable');
+    ).rejects.toThrow('Cannot connect to server. Please check your internet connection.');
   });
 });
