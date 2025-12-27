@@ -6,10 +6,10 @@ import { StreamingSitesProvider } from '../contexts/streaming-sites.context';
  * Optionally accepts initial streaming sites.
  */
 export function renderWithProviders(ui: React.ReactElement, options?: { initialSites?: string[]; isLoading?: boolean }) {
-  const mockPlatforms = options?.initialSites || ['Netflix', 'Max', 'Disney+'];
-  return (
-    <StreamingSitesProvider initialSites={mockPlatforms}>
-      {ui}
-    </StreamingSitesProvider>
-  );
+    const mockPlatforms = options?.initialSites || ['Netflix', 'Max', 'Disney+'];
+    return (
+        <StreamingSitesProvider initialSites={mockPlatforms}>
+            {ui}
+        </StreamingSitesProvider>
+    );
 }
