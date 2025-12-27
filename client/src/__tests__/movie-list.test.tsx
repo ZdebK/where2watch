@@ -6,16 +6,7 @@ import { MovieList } from '../components/movie-list';
 import { AuthProvider } from '../contexts/auth.context';
 import { StreamingSitesProvider } from '../contexts/streaming-sites.context';
 
-// Helper to mock fetch as a Response-like object (compatible with Jest/Node)
-function mockFetchJson(data: any) {
-  return jest.fn(() => Promise.resolve({
-    ok: true,
-    status: 200,
-    headers: { get: () => '123' },
-    json: () => Promise.resolve(data),
-    text: () => Promise.resolve(JSON.stringify(data)),
-  }));
-}
+import { mockFetchJson } from '../testUtils/mockFetch';
 
 const TestAuthProvider = ({ children }: { children: React.ReactNode }) => {
   return <AuthProvider>{children}</AuthProvider>;

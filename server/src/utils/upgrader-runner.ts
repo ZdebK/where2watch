@@ -1,3 +1,5 @@
+
+
 import dotenv from 'dotenv';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -131,7 +133,7 @@ export class UpgraderRunner {
  */
 export async function initializeUpgrader(): Promise<void> {
   const shouldRunUpgrades = process.env.RUN_UPGRADES === 'true';
-  
+
   if (!shouldRunUpgrades) {
     console.log('Database upgrades disabled (RUN_UPGRADES not set to true in .env)');
     return;

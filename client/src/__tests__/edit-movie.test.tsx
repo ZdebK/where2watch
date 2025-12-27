@@ -1,17 +1,7 @@
 import '@testing-library/jest-dom';
-import React from 'react';
 import { render, fireEvent, screen } from '@testing-library/react';
 import { AddEditModal } from '../components/add-edit-modal';
-import { StreamingSitesProvider } from '../contexts/streaming-sites.context';
-
-function renderWithProviders(ui: React.ReactElement) {
-  const mockPlatforms = ['Netflix', 'Max', 'Disney+'];
-  return render(
-    <StreamingSitesProvider initialSites={mockPlatforms}>
-      {ui}
-    </StreamingSitesProvider>
-  );
-}
+import { renderWithProviders } from '../testUtils/renderWithProviders';
 
 describe('Edit Movie', () => {
   it('loads movie data into edit form', () => {
@@ -27,7 +17,7 @@ describe('Edit Movie', () => {
       rating: 'R',
       description: 'A computer hacker learns about the true nature of reality and his role in the war against its controllers.',
     };
-    renderWithProviders(<AddEditModal isOpen={true} movie={movie} onSave={jest.fn()} onClose={() => { }} />);
+    render(renderWithProviders(<AddEditModal isOpen={true} movie={movie} onSave={jest.fn()} onClose={() => { }} />));
     expect(screen.getByDisplayValue('Matrix')).toBeInTheDocument();
     expect(screen.getByDisplayValue('Sci-Fi')).toBeInTheDocument();
   });
@@ -46,7 +36,7 @@ describe('Edit Movie', () => {
       rating: 'R',
       description: 'A computer hacker learns about the true nature of reality and his role in the war against its controllers.',
     };
-    renderWithProviders(<AddEditModal isOpen={true} movie={movie} onSave={onSave} onClose={() => { }} />);
+    render(renderWithProviders(<AddEditModal isOpen={true} movie={movie} onSave={onSave} onClose={() => { }} />));
     fireEvent.change(screen.getByLabelText(/Title/), { target: { value: 'Matrix Reloaded' } });
     fireEvent.click(screen.getByText(/Save Changes/));
     expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ title: 'Matrix Reloaded' }));
